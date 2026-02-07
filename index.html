@@ -82,39 +82,13 @@
       }
     }
 
-    function render(category) {
-      const container = document.getElementById('course-list');
-      container.innerHTML = '';
-      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
-      
-      filtered.forEach(c => {
-        const current = Number(c["目前人數"]) || 0;
-        const max = Number(c["上限"]) || 0;
-        const isFull = current >= max;
-        
-        container.innerHTML += `
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="course-date">${c["日期"] || ''} (${c["星期"]})</div>
-                <div class="course-title">${c["名稱"]}</div>
-              </div>
-              <div class="teacher-tag">${c["老師"]}</div>
-            </div>
-            <div class="course-detail">
-              <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
-            </div>
-            <div class="card-footer">
-              <div class="capacity">人數：${current} / ${max}</div>
-              <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
-                      onclick="handleBook('${c["課程ID"]}', ${isFull})">
-                ${isFull ? '名額已滿' : '立即預約'}
-              </button>
-            </div>
-          </div>`;
-      });
-    }
-
+function render(category) {
+  const container = document.getElementById('course-list');
+  container.innerHTML = '';
+  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+  
+  filtered.forEach(c => {
+    // 透過 Key 讀取資料，不受欄位先後順序影響
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
@@ -144,3 +118,4 @@
   </script>
 </body>
 </html>
+
