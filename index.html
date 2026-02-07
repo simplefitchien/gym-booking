@@ -107,46 +107,52 @@
     }
 
     // 渲染課表卡片
-    function render(category) {
-      const container = document.getElementById('course-list');
-      container.innerHTML = '';
-      
-      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
-      
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="loading-box">目前沒有「${category}」課程</div>`;
-        return;
-      }
+   function render(category) {
+  const container = document.getElementById('course-list');
+  container.innerHTML = '';
+  
+  // 篩選分類
+  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+  
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="loading-box">目前沒有「${category}」課程</div>`;
+    return;
+  }
 
-      filtered.forEach(c => {
-        // 動態根據標題名稱讀取，不受欄位位置影響
-        const current = parseInt(c["目前人數"]) || 0;
-        const max = parseInt(c["上限"]) || 0;
-        const isFull = current >= max;
-        const dateStr = c["日期"] ? c["日期"] : "";
-        
-        container.innerHTML += `
-          <div class="card">
-            <div class="card-header">
-              <div class="course-info">
-                <div class="course-date">${dateStr} (${c["星期"]})</div>
-                <div class="course-title">${c["名稱"]}</div>
-              </div>
-              <div class="teacher-tag">👤 ${c["老師"]}</div>
-            </div>
-            <div class="course-detail">
-              <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
-            </div>
-            <div class="card-footer">
-              <div class="capacity">人數：${current} / ${max}</div>
-              <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
-                      onclick="handleBook('${c["課程ID"]}', ${isFull})">
-                ${isFull ? '名額已滿' : '立即預約'}
-              </button>
-            </div>
-          </div>`;
-      });
+  filtered.forEach(c => {
+    const current = parseInt(c["目前人數"]) || 0;
+    const max = parseInt(c["上限"]) || 0;
+    const isFull = current >= max;
+
+    // --- 關鍵修正：去除 T 之後的時間字串 ---
+    let dateStr = c["日期"] ? String(c["日期"]) : "";
+    if (dateStr.includes("T")) {
+      dateStr = dateStr.split("T")[0]; // 擷取 T 以前的字元 (YYYY-MM-DD)
     }
+    // ------------------------------------
+
+    container.innerHTML += `
+      <div class="card">
+        <div class="card-header">
+          <div class="course-info">
+            <div class="course-date">${dateStr} (${c["星期"]})</div>
+            <div class="course-title">${c["名稱"]}</div>
+          </div>
+          <div class="teacher-tag">👤 ${c["老師"]}</div>
+        </div>
+        <div class="course-detail">
+          <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
+        </div>
+        <div class="card-footer">
+          <div class="capacity">人數：${current} / ${max}</div>
+          <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
+                  onclick="handleBook('${c["課程ID"]}', ${isFull})">
+            ${isFull ? '名額已滿' : '立即預約'}
+          </button>
+        </div>
+      </div>`;
+  });
+}
 
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -189,3 +195,4 @@
   </script>
 </body>
 </html>
+
