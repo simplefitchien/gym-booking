@@ -1,79 +1,185 @@
-const SPREADSHEET_ID = '16VagP02y4m82ym2ADxp60_Bdgo5sd21Q_4Jm2NII2wY'; 
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極簡運動 - 預約系統</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; }
+    body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .user-name { font-weight: bold; color: var(--primary); }
+    .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
+    .tab { padding: 8px 20px; font-size: 14px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; color: #666; transition: 0.3s; }
+    .tab.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
+    #course-list { padding: 15px; padding-bottom: 50px; }
+    .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .course-title { font-size: 1.2em; font-weight: bold; color: #000; }
+    .teacher-tag { font-size: 0.85em; background: #e8f5e9; color: #2e7d32; padding: 3px 10px; border-radius: 5px; }
+    .course-detail { font-size: 0.95em; color: #555; line-height: 1.8; }
+    .highlight { color: #000; font-weight: 600; }
+    .card-footer { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
+    .capacity { font-size: 0.9em; color: #888; }
+    .btn-book { padding: 10px 25px; border-radius: 10px; border: none; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
+    .btn-active { background: var(--primary); color: white; }
+    .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
+    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:100px; overflow-y:auto; border-bottom:2px solid #00b900; }
+    .loading-box { text-align: center; padding: 50px; color: #999; }
+  </style>
+</head>
+<body>
 
+  <div id="debug-log"><div>[系統狀態監測中...]</div></div>
 
-function doGet(e) {
-  // �^�ǽҪ����
-  const data = getCourses(); 
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+  <div class="header">
+    <div id="status">正在啟動 LIFF...</div>
+  </div>
+  
+  <div class="nav-tabs">
+    <div class="tab active" data-cat="肌力" onclick="changeTab(this)">💪 肌力</div>
+    <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
+  </div>
 
-function doPost(e) {
-  // �B�z�w���ШD
-  const params = JSON.parse(e.postData.contents);
-  const result = handleBooking(params); // �I�s�A�쥻���w���޿�
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+  <div id="course-list">
+    <div class="loading-box">載入中，請稍候...</div>
+  </div>
 
-// function getCourses() {
-//   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-//   const sheet = ss.getSheetByName("�ҵ{�M��");
-//   const data = sheet.getDataRange().getValues();
-//   const headers = data.shift().map(h => String(h).trim()); 
-//   return data.filter(row => row[0] !== "").map(row => {
-//     let obj = {};
-//     headers.forEach((header, i) => { obj[header] = row[i]; });
-//     return obj;
-//   });
-// }
-// �ץ��GgetCourses �����^�ǰ}�C
-function getCourses() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("�ҵ{�M��");
-  const values = sheet.getDataRange().getValues();
-  const headers = values.shift();
-  return values.map(row => {
-    let obj = {};
-    headers.forEach((h, i) => obj[h] = row[i]);
-    return obj;
-  });
-}
-// �o�q�����d�b .gs �ɮ׸�
-function handleBooking(params) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000); 
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const courseSheet = ss.getSheetByName("�ҵ{�M��");
-    const recordSheet = ss.getSheetByName("�w������");
-    
-    if (!recordSheet) return { "result": "���ѡG�䤣��y�w�������z����" };
+  <script>
+      // --- 請修改以下設定 ---
+    const LIFF_ID = "2009018322-JGFORbhc"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
+      // ----------------------
 
-    const courseData = courseSheet.getDataRange().getValues();
-    let targetRow = -1;
-    let courseName = "";
+      let allCourses = [];
+      let isLiffReady = false;
 
-    for (let i = 1; i < courseData.length; i++) {
-      if (String(courseData[i][0]).trim() === String(params.courseId).trim()) {
-        targetRow = i + 1;
-        courseName = courseData[i][2];
-        break;
+      function log(msg) {
+        const logEl = document.getElementById('debug-log');
+        const time = new Date().toLocaleTimeString();
+          logEl.innerHTML += `<div>[${time}] ${msg}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(msg);
       }
-    }
 
-    if (targetRow === -1) return { "result": "���ѡG�䤣��ҵ{" };
+      // 初始化程式
+      window.onload = async function() {
+          log("網頁載入完成，初始化 LIFF...");
+          try {
+              await liff.init({ 
+                  liffId: LIFF_ID,
+                  withLoginOnExternalBrowser: true 
+              });
 
-    // �g�J�w������
-    recordSheet.appendRow([params.courseId, courseName, params.userName, params.userId, new Date()]);
-    
-    // ��s�H�� (�� 8 �欰 H ��)
-    const countCell = courseSheet.getRange(targetRow, 8);
-    countCell.setValue(Number(countCell.getValue()) + 1);
+              if (!liff.isLoggedIn()) {
+                  log("⚠️ 未登入，導向 LINE 登入...");
+                  liff.login();
+              } else {
+                  log("✅ LIFF 登入成功");
+                  isLiffReady = true;
+                const profile = await liff.getProfile();
+                  document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
+                  fetchData(); // 登入成功後抓取課表
+              }
+          } catch (err) {
+              log("❌ LIFF 初始化失敗: " + err.message);
+              document.getElementById('status').innerText = "系統初始化失敗，請稍後再試";
+          }
+      };
 
-    return { "result": "�w�����\�I" };
-  } catch (err) {
-    return { "result": "�t�Υ��ѡG" + err.toString() };
-  } finally {
-    lock.releaseLock();
-  }
-}
+      // 抓取 Google Sheet 資料 (使用 fetch API 取代 google.script.run)
+      async function fetchData() {
+          log("📊 正在連接 GAS 抓取課表...");
+          try {
+            const response = await fetch(GAS_URL);
+              if (!response.ok) throw new Error("網路請求失敗");
+        
+              allCourses = await response.json();
+              log("📈 課表載入成功，共 " + allCourses.length + " 筆");
+              render('肌力');
+          } catch (err) {
+              log("❌ 課表載入失敗: " + err.message);
+              document.getElementById('course-list').innerHTML = `<div class="loading-box">資料抓取失敗：${err.message}</div>`;
+          }
+      }
+
+      // 渲染課表卡片
+      function render(category) {
+        const container = document.getElementById('course-list');
+          container.innerHTML = '';
+      
+        const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+      
+          if (filtered.length === 0) {
+              container.innerHTML = `<div class="loading-box">目前沒有「${category}」課程</div>`;
+              return;
+          }
+
+          filtered.forEach(c => {
+              const current = parseInt(c["目前人數"]) || 0;
+          const max = parseInt(c["上限"]) || 0;
+          const isFull = current >= max;
+        
+          container.innerHTML += `
+            <div class="card">
+              <div class="card-header">
+                <div class="course-title">${c["名稱"]}</div>
+                <div class="teacher-tag">👤 ${c["老師"]} 老師</div>
+              </div>
+              <div class="course-detail">
+                <div>🗓️ 星期：<span class="highlight">${c["星期"]}</span></div>
+                <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
+              </div>
+              <div class="card-footer">
+                <div class="capacity">人數：${current} / ${max}</div>
+                <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
+          onclick="handleBook('${c["課程ID"]}', ${isFull})">
+    ${isFull ? '名額已滿' : '立即預約'}
+          </button>
+        </div>
+      </div>`;
+      });
+      }
+
+      function changeTab(el) {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          el.classList.add('active');
+          render(el.getAttribute('data-cat'));
+      }
+
+      // 提交預約 (使用 fetch POST)
+      async function handleBook(id, isFull) {
+          if (isFull || !isLiffReady) return;
+          if (!confirm("確定要預約這堂課嗎？")) return;
+
+        const statusEl = document.getElementById('status');
+        const oldStatus = statusEl.innerHTML;
+          statusEl.innerText = "⏳ 處理預約中...";
+
+          try {
+            const profile = await liff.getProfile();
+            const payload = {
+                courseId: id,
+                userId: profile.userId,
+                userName: profile.displayName
+            };
+
+            const response = await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+              alert(result.result || "預約結果已回傳");
+              location.reload(); // 重新整理網頁更新人數
+
+          } catch (err) {
+              log("❌ 預約失敗: " + err.message);
+              alert("預約連線失敗，請檢查網路");
+              statusEl.innerHTML = oldStatus;
+          }
+      }
+  </script>
+</body>
+</html>
