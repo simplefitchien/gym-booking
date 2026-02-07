@@ -7,7 +7,7 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .user-name { font-weight: bold; color: var(--primary); }
     .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
@@ -16,25 +16,27 @@
     #course-list { padding: 15px; padding-bottom: 50px; }
     .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .course-info { flex-grow: 1; }
+    .course-date { font-size: 0.85em; color: #ff5722; font-weight: bold; margin-bottom: 2px; }
     .course-title { font-size: 1.1em; font-weight: bold; color: #000; }
-    .course-date { font-size: 0.9em; color: #ff5722; font-weight: bold; }
-    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; }
+    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
     .course-detail { font-size: 0.9em; color: #555; line-height: 1.6; margin-top: 5px; }
     .highlight { color: #000; font-weight: 600; }
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
     .capacity { font-size: 0.85em; color: #888; }
-    .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; }
+    .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; }
     .btn-active { background: var(--primary); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
-    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:80px; overflow-y:auto; }
+    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:80px; overflow-y:auto; border-bottom:2px solid #00b900; }
+    .loading-box { text-align: center; padding: 50px; color: #999; }
   </style>
 </head>
 <body>
 
-  <div id="debug-log"><div>[系統啟動中...]</div></div>
+  <div id="debug-log"><div>[系統日誌監測中...]</div></div>
 
   <div class="header">
-    <div id="status">正在讀取...</div>
+    <div id="status">正在啟動預約系統...</div>
   </div>
   
   <div class="nav-tabs">
@@ -42,80 +44,148 @@
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
   </div>
 
-  <div id="course-list"><div style="text-align:center; padding:50px; color:#999;">載入課表中...</div></div>
+  <div id="course-list">
+    <div class="loading-box">載入中，請稍候...</div>
+  </div>
 
   <script>
+    // --- 已填入你的設定 ---
     const LIFF_ID = "2009018322-JGFORbhc"; 
-    const GAS_URL = "你的_GAS_網址"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
+    // ----------------------
 
     let allCourses = [];
+    let isLiffReady = false;
 
     function log(msg) {
       const logEl = document.getElementById('debug-log');
-      logEl.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      const time = new Date().toLocaleTimeString();
+      logEl.innerHTML += `<div>[${time}] ${msg}</div>`;
       logEl.scrollTop = logEl.scrollHeight;
+      console.log(msg);
     }
 
+    // 初始化程式
     window.onload = async function() {
+      log("網頁載入完成，初始化 LIFF...");
       try {
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        await liff.init({ 
+          liffId: LIFF_ID,
+          withLoginOnExternalBrowser: true 
+        });
+
         if (!liff.isLoggedIn()) {
+          log("⚠️ 未登入，導向 LINE 登入...");
           liff.login();
         } else {
+          log("✅ LIFF 登入成功");
+          isLiffReady = true;
           const profile = await liff.getProfile();
           document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
-          fetchData();
+          fetchData(); 
         }
       } catch (err) {
-        log("初始化失敗: " + err.message);
+        log("❌ LIFF 初始化失敗: " + err.message);
+        document.getElementById('status').innerText = "系統初始化失敗";
       }
     };
 
+    // 抓取課表資料 (透過 GAS Web App)
     async function fetchData() {
+      log("📊 正在讀取雲端課表...");
       try {
-        const res = await fetch(GAS_URL);
-        allCourses = await res.json();
+        const response = await fetch(GAS_URL);
+        if (!response.ok) throw new Error("網路請求失敗");
+        
+        allCourses = await response.json();
+        log("📈 課表載入完成");
         render('肌力');
-        log("✅ 課表更新成功");
       } catch (err) {
         log("❌ 抓取失敗: " + err.message);
+        document.getElementById('course-list').innerHTML = `<div class="loading-box">資料讀取失敗，請重新開啟</div>`;
       }
     }
 
-function render(category) {
-  const container = document.getElementById('course-list');
-  container.innerHTML = '';
-  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
-  
-  filtered.forEach(c => {
-    // 透過 Key 讀取資料，不受欄位先後順序影響
+    // 渲染課表卡片
+    function render(category) {
+      const container = document.getElementById('course-list');
+      container.innerHTML = '';
+      
+      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="loading-box">目前沒有「${category}」課程</div>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        // 動態根據標題名稱讀取，不受欄位位置影響
+        const current = parseInt(c["目前人數"]) || 0;
+        const max = parseInt(c["上限"]) || 0;
+        const isFull = current >= max;
+        const dateStr = c["日期"] ? c["日期"] : "";
+        
+        container.innerHTML += `
+          <div class="card">
+            <div class="card-header">
+              <div class="course-info">
+                <div class="course-date">${dateStr} (${c["星期"]})</div>
+                <div class="course-title">${c["名稱"]}</div>
+              </div>
+              <div class="teacher-tag">👤 ${c["老師"]}</div>
+            </div>
+            <div class="course-detail">
+              <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
+            </div>
+            <div class="card-footer">
+              <div class="capacity">人數：${current} / ${max}</div>
+              <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
+                      onclick="handleBook('${c["課程ID"]}', ${isFull})">
+                ${isFull ? '名額已滿' : '立即預約'}
+              </button>
+            </div>
+          </div>`;
+      });
+    }
+
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
       render(el.getAttribute('data-cat'));
     }
 
+    // 執行預約動作
     async function handleBook(id, isFull) {
-      if (isFull || !confirm("確定要預約嗎？")) return;
-      
+      if (isFull || !isLiffReady) return;
+      if (!confirm("確定要預約這堂課程嗎？")) return;
+
       const statusEl = document.getElementById('status');
-      statusEl.innerText = "⏳ 處理預約中...";
+      const originalStatus = statusEl.innerHTML;
+      statusEl.innerText = "⏳ 正在處理預約，請稍候...";
 
       try {
         const profile = await liff.getProfile();
-        const res = await fetch(GAS_URL, {
+        const payload = {
+          courseId: id,
+          userId: profile.userId,
+          userName: profile.displayName
+        };
+
+        const response = await fetch(GAS_URL, {
           method: "POST",
-          body: JSON.stringify({ courseId: id, userId: profile.userId, userName: profile.displayName })
+          body: JSON.stringify(payload)
         });
-        const result = await res.json();
+
+        const result = await response.json();
         alert(result.result);
-        location.reload();
+        location.reload(); 
+
       } catch (err) {
-        alert("預約失敗");
-        statusEl.innerText = "連線錯誤";
+        log("❌ 預約失敗: " + err.message);
+        alert("連線失敗，請再試一次");
+        statusEl.innerHTML = originalStatus;
       }
     }
   </script>
 </body>
 </html>
-
