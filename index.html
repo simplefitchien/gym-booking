@@ -119,27 +119,25 @@
     return;
   }
 
-  filtered.forEach(c => {
-    const current = parseInt(c["目前人數"]) || 0;
-    const max = parseInt(c["上限"]) || 0;
-    const isFull = current >= max;
+filtered.forEach(c => {
+  const current = parseInt(c["目前人數"]) || 0;
+  const max = parseInt(c["上限"]) || 0;
+  const isFull = current >= max;
 
-    // --- 關鍵修正：去除 T 之後的時間字串 ---
-    let dateStr = c["日期"] ? String(c["日期"]) : "";
-    if (dateStr.includes("T")) {
-      dateStr = dateStr.split("T")[0]; // 擷取 T 以前的字元 (YYYY-MM-DD)
-    }
-    // ------------------------------------
+  // --- 修正處：去除日期字串中的 T 與後續時間 ---
+  let rawDate = c["日期"] ? String(c["日期"]) : "";
+  let displayDate = rawDate.split("T")[0]; // 這樣會把 2026-02-09T... 變成 2026-02-09
+  // ------------------------------------------
 
-    container.innerHTML += `
-      <div class="card">
-        <div class="card-header">
-          <div class="course-info">
-            <div class="course-date">${dateStr} (${c["星期"]})</div>
-            <div class="course-title">${c["名稱"]}</div>
-          </div>
-          <div class="teacher-tag">👤 ${c["老師"]}</div>
+  container.innerHTML += `
+    <div class="card">
+      <div class="card-header">
+        <div class="course-info">
+          <div class="course-date">${displayDate} (${c["星期"]})</div>
+          <div class="course-title">${c["名稱"]}</div>
         </div>
+        <div class="teacher-tag">👤 ${c["老師"]}</div>
+      </div>
         <div class="course-detail">
           <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
         </div>
@@ -195,4 +193,5 @@
   </script>
 </body>
 </html>
+
 
