@@ -6,43 +6,37 @@
   <title>極簡運動 - 預約系統</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; --danger: #ff4d4d; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    :root { --primary: #00b900; --bg: #f8f9fa; --danger: #ff4d4d; }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; }
     .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .user-name { font-weight: bold; color: var(--primary); }
     .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
     .tab { padding: 8px 20px; font-size: 14px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; color: #666; transition: 0.3s; }
     .tab.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
-    #course-list { padding: 15px; padding-bottom: 50px; }
+    #course-list { padding: 15px; }
     .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .course-date { font-size: 0.9em; color: #ff5722; font-weight: bold; }
-    .course-title { font-size: 1.1em; font-weight: bold; color: #000; }
-    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; }
-    .course-detail { font-size: 0.9em; color: #555; line-height: 1.6; margin-top: 5px; }
-    .highlight { color: #000; font-weight: 600; }
+    .course-title { font-size: 1.1em; font-weight: bold; color: #000; margin: 5px 0; }
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
-    .capacity { font-size: 0.85em; color: #888; }
-    .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; }
+    
+    .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 0.85em; }
+    
+    .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-active { background: var(--primary); color: white; }
     .btn-delete { background: var(--danger); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
-    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:80px; overflow-y:auto; }
 
-    /* --- 新增：查詢名單彈出視窗樣式 --- */
-    .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; }
+    /* 彈窗樣式 */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-    .modal-content { background: white; margin: 25% auto; padding: 20px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal-content { background: white; margin: 25% auto; padding: 20px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; }
     .modal-list { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; line-height: 2; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
-    .btn-close { background: #666; color: white; padding: 8px 20px; border-radius: 8px; border: none; margin-top: 10px; width: 100%; font-weight: bold; }
+    .btn-close { background: #666; color: white; padding: 8px 20px; border-radius: 8px; border: none; width: 100%; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <div id="debug-log"><div>[系統啟動中...]</div></div>
-
   <div class="header">
-    <div id="status">正在讀取...</div>
+    <div id="status">正在載入系統...</div>
   </div>
   
   <div class="nav-tabs">
@@ -50,7 +44,7 @@
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
   </div>
 
-  <div id="course-list"><div style="text-align:center; padding:50px; color:#999;">載入中...</div></div>
+  <div id="course-list">讀取中...</div>
 
   <div id="userModal" class="modal">
     <div class="modal-content">
@@ -63,41 +57,22 @@
   <script>
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
-
     let allCourses = [];
 
-    function log(msg) {
-      const logEl = document.getElementById('debug-log');
-      logEl.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-
     window.onload = async function() {
-      try {
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
-          fetchData(profile.userId);
-        }
-      } catch (err) {
-        log("初始化失敗: " + err.message);
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) { liff.login(); }
+      else {
+        const profile = await liff.getProfile();
+        document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
+        fetchData(profile.userId);
       }
     };
 
     async function fetchData(userId) {
-      log("📊 正在同步個人課表狀態...");
-      try {
-        const response = await fetch(`${GAS_URL}?userId=${userId}`);
-        allCourses = await response.json();
-        log("✅ 課表載入完成");
-        const activeTab = document.querySelector('.tab.active').getAttribute('data-cat');
-        render(activeTab);
-      } catch (err) {
-        log("❌ 載入失敗: " + err.message);
-      }
+      const response = await fetch(`${GAS_URL}?userId=${userId}`);
+      allCourses = await response.json();
+      render('肌力');
     }
 
     function render(category) {
@@ -106,41 +81,23 @@
       const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
       
       filtered.forEach(c => {
-        const bookedUsers = c["bookedUsers"] || []; // 取得從 GAS 傳來的名單
-        const current = bookedUsers.length;
+        const current = parseInt(c["目前人數"]) || 0;
         const max = parseInt(c["上限"]) || 0;
         const isFull = current >= max;
-        const isBooked = c["isBooked"]; 
-        const usersJson = JSON.stringify(bookedUsers); // 轉為 JSON 字串以利傳遞
+        const isBooked = c["isBooked"];
 
-        let displayDate = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
-        
-        let btnHtml = "";
-        if (isBooked) {
-          btnHtml = `<button class="btn-book btn-delete" onclick="handleAction('${c["課程ID"]}', 'delete')">取消預約</button>`;
-        } else if (isFull) {
-          btnHtml = `<button class="btn-book btn-full">名額已滿</button>`;
-        } else {
-          btnHtml = `<button class="btn-book btn-active" onclick="handleAction('${c["課程ID"]}', 'book')">立即預約</button>`;
-        }
+        let btnHtml = isBooked 
+          ? `<button class="btn-book btn-delete" onclick="handleAction('${c["課程ID"]}', 'delete')">取消預約</button>`
+          : (isFull ? `<button class="btn-book btn-full">名額已滿</button>` : `<button class="btn-book btn-active" onclick="handleAction('${c["課程ID"]}', 'book')">立即預約</button>`);
 
         container.innerHTML += `
           <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="course-date">${displayDate} (${c["星期"]})</div>
-                <div class="course-title">${c["名稱"]}</div>
-              </div>
-              <div class="teacher-tag">${c["老師"]}</div>
-            </div>
-            <div class="course-detail">
-              <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
-            </div>
+            <div class="course-date">${c["日期"]} (${c["星期"]})</div>
+            <div class="course-title">${c["名稱"]} - ${c["老師"]}</div>
+            <div style="font-size:0.9em; color:#666;">⏰ 時段：${c["時段"]}</div>
             <div class="card-footer">
-              <div class="capacity">
-                人數：<span class="capacity-link" onclick='showUsers("${c["名稱"]}", ${usersJson})'>
-                  ${current} / ${max}
-                </span>
+              <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">
+                人數：${current} / ${max} (查看名單)
               </div>
               ${btnHtml}
             </div>
@@ -148,20 +105,24 @@
       });
     }
 
-    /* --- 新增：名單彈出視窗處理函式 --- */
-    function showUsers(title, users) {
-      document.getElementById('modal-title').innerText = title + " 預約名單";
+    /* --- 新增：即時查詢名單函式 --- */
+    async function showUsers(courseId, courseName) {
       const list = document.getElementById('modal-text');
-      list.innerHTML = users.length > 0 
-        ? users.map((u, i) => `${i + 1}. ${u}`).join('<br>') 
-        : "目前尚無人預約";
+      document.getElementById('modal-title').innerText = courseName + " 預約名單";
+      list.innerHTML = "⏳ 正在同步最新名單..."; // 給使用者即時回饋
       document.getElementById('userModal').style.display = 'block';
+
+      try {
+        // 發起即時查詢請求
+        const response = await fetch(`${GAS_URL}?action=getUsers&courseId=${courseId}`);
+        const users = await response.json();
+        list.innerHTML = users.length > 0 ? users.map((u, i) => `${i + 1}. ${u}`).join('<br>') : "目前尚無人預約";
+      } catch (err) {
+        list.innerHTML = "❌ 查詢失敗";
+      }
     }
 
-    function closeModal() {
-      document.getElementById('userModal').style.display = 'none';
-    }
-
+    function closeModal() { document.getElementById('userModal').style.display = 'none'; }
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
@@ -169,31 +130,15 @@
     }
 
     async function handleAction(id, action) {
-      const confirmMsg = action === 'delete' ? "確定要取消預約並釋出名額嗎？" : "確定要預約這堂課程嗎？";
-      if (!confirm(confirmMsg)) return;
-
-      const statusEl = document.getElementById('status');
-      const originalStatus = statusEl.innerHTML;
-      statusEl.innerText = "⏳ 處理中...";
-
-      try {
-        const profile = await liff.getProfile();
-        const response = await fetch(GAS_URL, {
-          method: "POST",
-          body: JSON.stringify({ 
-            action: action, 
-            courseId: id, 
-            userId: profile.userId, 
-            userName: profile.displayName 
-          })
-        });
-        const result = await response.json();
-        alert(result.result);
-        location.reload(); 
-      } catch (err) {
-        alert("連線失敗，請檢查網路");
-        statusEl.innerHTML = originalStatus;
-      }
+      if (!confirm("確定要執行此操作？")) return;
+      const profile = await liff.getProfile();
+      const response = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: action, courseId: id, userId: profile.userId, userName: profile.displayName })
+      });
+      const result = await response.json();
+      alert(result.result);
+      location.reload();
     }
   </script>
 </body>
