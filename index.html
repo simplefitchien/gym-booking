@@ -6,8 +6,8 @@
   <title>極簡運動 - 預約系統</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; }
-    body { font-family: -apple-system, "Helvetica Neue", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; --danger: #ff4d4d; }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .user-name { font-weight: bold; color: var(--primary); }
     .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
@@ -16,27 +16,26 @@
     #course-list { padding: 15px; padding-bottom: 50px; }
     .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .course-info { flex-grow: 1; }
-    .course-date { font-size: 0.85em; color: #ff5722; font-weight: bold; margin-bottom: 2px; }
+    .course-date { font-size: 0.9em; color: #ff5722; font-weight: bold; }
     .course-title { font-size: 1.1em; font-weight: bold; color: #000; }
-    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
+    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; }
     .course-detail { font-size: 0.9em; color: #555; line-height: 1.6; margin-top: 5px; }
     .highlight { color: #000; font-weight: 600; }
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
     .capacity { font-size: 0.85em; color: #888; }
     .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; }
     .btn-active { background: var(--primary); color: white; }
+    .btn-delete { background: var(--danger); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
-    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:80px; overflow-y:auto; border-bottom:2px solid #00b900; }
-    .loading-box { text-align: center; padding: 50px; color: #999; }
+    #debug-log { background:#222; color:#0f0; font-family:monospace; padding:10px; font-size:11px; height:80px; overflow-y:auto; }
   </style>
 </head>
 <body>
 
-  <div id="debug-log"><div>[系統日誌監測中...]</div></div>
+  <div id="debug-log"><div>[系統啟動中...]</div></div>
 
   <div class="header">
-    <div id="status">正在啟動預約系統...</div>
+    <div id="status">正在讀取...</div>
   </div>
   
   <div class="nav-tabs">
@@ -44,113 +43,94 @@
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
   </div>
 
-  <div id="course-list">
-    <div class="loading-box">載入中，請稍候...</div>
-  </div>
+  <div id="course-list"><div style="text-align:center; padding:50px; color:#999;">載入中...</div></div>
 
   <script>
-    // --- 已填入你的設定 ---
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
-    // ----------------------
 
     let allCourses = [];
-    let isLiffReady = false;
 
     function log(msg) {
       const logEl = document.getElementById('debug-log');
-      const time = new Date().toLocaleTimeString();
-      logEl.innerHTML += `<div>[${time}] ${msg}</div>`;
+      logEl.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
       logEl.scrollTop = logEl.scrollHeight;
-      console.log(msg);
     }
 
-    // 初始化程式
     window.onload = async function() {
-      log("網頁載入完成，初始化 LIFF...");
       try {
-        await liff.init({ 
-          liffId: LIFF_ID,
-          withLoginOnExternalBrowser: true 
-        });
-
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
         if (!liff.isLoggedIn()) {
-          log("⚠️ 未登入，導向 LINE 登入...");
           liff.login();
         } else {
-          log("✅ LIFF 登入成功");
-          isLiffReady = true;
           const profile = await liff.getProfile();
           document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
-          fetchData(); 
+          fetchData(profile.userId);
         }
       } catch (err) {
-        log("❌ LIFF 初始化失敗: " + err.message);
-        document.getElementById('status').innerText = "系統初始化失敗";
+        log("初始化失敗: " + err.message);
       }
     };
 
-    // 抓取課表資料 (透過 GAS Web App)
-    async function fetchData() {
-      log("📊 正在讀取雲端課表...");
+    async function fetchData(userId) {
+      log("📊 正在同步個人課表狀態...");
       try {
-        const response = await fetch(GAS_URL);
-        if (!response.ok) throw new Error("網路請求失敗");
-        
+        // 透過 URL 參數將 userId 傳給 GAS 以標記 isBooked 狀態
+        const response = await fetch(`${GAS_URL}?userId=${userId}`);
         allCourses = await response.json();
-        log("📈 課表載入完成");
-        render('肌力');
+        log("✅ 課表載入完成");
+        const activeTab = document.querySelector('.tab.active').getAttribute('data-cat');
+        render(activeTab);
       } catch (err) {
-        log("❌ 抓取失敗: " + err.message);
-        document.getElementById('course-list').innerHTML = `<div class="loading-box">資料讀取失敗，請重新開啟</div>`;
+        log("❌ 載入失敗: " + err.message);
       }
     }
 
-    // 渲染課表卡片
-   function render(category) {
-  const container = document.getElementById('course-list');
-  container.innerHTML = '';
-  
-  // 篩選分類
-  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
-  
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="loading-box">目前沒有「${category}」課程</div>`;
-    return;
-  }
+    function render(category) {
+      const container = document.getElementById('course-list');
+      container.innerHTML = '';
+      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+      
+      filtered.forEach(c => {
+        const current = parseInt(c["目前人數"]) || 0;
+        const max = parseInt(c["上限"]) || 0;
+        const isFull = current >= max;
+        const isBooked = c["isBooked"]; 
 
-filtered.forEach(c => {
-  const current = parseInt(c["目前人數"]) || 0;
-  const max = parseInt(c["上限"]) || 0;
-  const isFull = current >= max;
+        // 處理日期顯示：去除 ISO 格式中的時間部分 (T15:12...)
+        let displayDate = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
+        
+        // 根據狀態渲染按鈕
+        let btnHtml = "";
+        if (isBooked) {
+          // 已預約狀態呈現紅色按鈕
+          btnHtml = `<button class="btn-book btn-delete" onclick="handleAction('${c["課程ID"]}', 'delete')">取消預約</button>`;
+        } else if (isFull) {
+          btnHtml = `<button class="btn-book btn-full">名額已滿</button>`;
+        } else {
+          // 一般預約呈現綠色按鈕
+          btnHtml = `<button class="btn-book btn-active" onclick="handleAction('${c["課程ID"]}', 'book')">立即預約</button>`;
+        }
 
-  // --- 修正處：去除日期字串中的 T 與後續時間 ---
-  let rawDate = c["日期"] ? String(c["日期"]) : "";
-  let displayDate = rawDate.split("T")[0]; // 這樣會把 2026-02-09T... 變成 2026-02-09
-  // ------------------------------------------
-
-  container.innerHTML += `
-    <div class="card">
-      <div class="card-header">
-        <div class="course-info">
-          <div class="course-date">${displayDate} (${c["星期"]})</div>
-          <div class="course-title">${c["名稱"]}</div>
-        </div>
-        <div class="teacher-tag">👤 ${c["老師"]}</div>
-      </div>
-        <div class="course-detail">
-          <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
-        </div>
-        <div class="card-footer">
-          <div class="capacity">人數：${current} / ${max}</div>
-          <button class="btn-book ${isFull ? 'btn-full' : 'btn-active'}" 
-                  onclick="handleBook('${c["課程ID"]}', ${isFull})">
-            ${isFull ? '名額已滿' : '立即預約'}
-          </button>
-        </div>
-      </div>`;
-  });
-}
+        container.innerHTML += `
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="course-date">${displayDate} (${c["星期"]})</div>
+                <div class="course-title">${c["名稱"]}</div>
+              </div>
+              <div class="teacher-tag">${c["老師"]}</div>
+            </div>
+            <div class="course-detail">
+              <div>⏰ 時段：<span class="highlight">${c["時段"]}</span></div>
+            </div>
+            <div class="card-footer">
+              <div class="capacity">人數：${current} / ${max}</div>
+              ${btnHtml}
+            </div>
+          </div>`;
+      });
+    }
 
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -158,40 +138,34 @@ filtered.forEach(c => {
       render(el.getAttribute('data-cat'));
     }
 
-    // 執行預約動作
-    async function handleBook(id, isFull) {
-      if (isFull || !isLiffReady) return;
-      if (!confirm("確定要預約這堂課程嗎？")) return;
+    async function handleAction(id, action) {
+      const confirmMsg = action === 'delete' ? "確定要取消預約並釋出名額嗎？" : "確定要預約這堂課程嗎？";
+      if (!confirm(confirmMsg)) return;
 
       const statusEl = document.getElementById('status');
       const originalStatus = statusEl.innerHTML;
-      statusEl.innerText = "⏳ 正在處理預約，請稍候...";
+      statusEl.innerText = "⏳ 處理中...";
 
       try {
         const profile = await liff.getProfile();
-        const payload = {
-          courseId: id,
-          userId: profile.userId,
-          userName: profile.displayName
-        };
-
+        // 透過 POST action 參數區分「預約」或「刪除」
         const response = await fetch(GAS_URL, {
           method: "POST",
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ 
+            action: action, 
+            courseId: id, 
+            userId: profile.userId, 
+            userName: profile.displayName 
+          })
         });
-
         const result = await response.json();
         alert(result.result);
         location.reload(); 
-
       } catch (err) {
-        log("❌ 預約失敗: " + err.message);
-        alert("連線失敗，請再試一次");
+        alert("連線失敗，請檢查網路");
         statusEl.innerHTML = originalStatus;
       }
     }
   </script>
 </body>
 </html>
-
-
