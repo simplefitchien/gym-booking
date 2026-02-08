@@ -8,38 +8,52 @@
   <style>
     :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; --danger: #ff4d4d; }
     body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    
+    /* 標頭樣式 */
     .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .user-name { font-weight: bold; color: var(--primary); }
+    
+    /* 分頁導覽 */
     .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
     .tab { padding: 8px 20px; font-size: 14px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; color: #666; transition: 0.3s; }
     .tab.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
+    
+    /* 課程列表 */
     #course-list { padding: 15px; padding-bottom: 50px; }
     .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    
+    /* 卡片頭部：日期與標題在左，老師在右 */
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .course-date { font-size: 0.9em; color: #ff5722; font-weight: bold; }
-    .course-title { font-size: 1.1em; font-weight: bold; color: #000; }
-    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; }
+    .course-title { font-size: 1.1em; font-weight: bold; color: #000; margin-top: 2px; }
+    .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; white-space: nowrap; margin-left: 10px; }
+    
+    /* 課程詳細資訊 */
     .course-detail { font-size: 0.9em; color: #555; line-height: 1.6; margin-top: 5px; }
     .highlight { color: #000; font-weight: 600; }
+    
+    /* 卡片底部：人數與按鈕 */
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
     .capacity { font-size: 0.85em; color: #888; }
+    .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; }
+    
+    /* 按鈕樣式 */
     .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; }
     .btn-active { background: var(--primary); color: white; }
     .btn-delete { background: var(--danger); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
-    
+
     /* 彈出視窗樣式 */
-    .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; }
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-    .modal-content { background: white; margin: 25% auto; padding: 20px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; }
+    .modal-content { background: white; margin: 25% auto; padding: 20px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .modal-list { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; line-height: 2; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
-    .btn-close { background: #666; color: white; padding: 8px 20px; border-radius: 8px; border: none; margin-top: 10px; width: 100%; font-weight: bold; }
+    .btn-close { background: #666; color: white; padding: 10px; border-radius: 8px; border: none; margin-top: 10px; width: 100%; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div id="status">正在讀取...</div>
+    <div id="status">正在同步系統...</div>
   </div>
   
   <div class="nav-tabs">
@@ -47,13 +61,13 @@
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
   </div>
 
-  <div id="course-list"><div style="text-align:center; padding:50px; color:#999;">載入中...</div></div>
+  <div id="course-list"><div style="text-align:center; padding:50px; color:#999;">課程載入中...</div></div>
 
   <div id="userModal" class="modal">
     <div class="modal-content">
       <h3 id="modal-title" style="margin: 0 0 10px 0; font-size: 1.1em;">預約名單</h3>
       <div id="modal-text" class="modal-list"></div>
-      <button class="btn-close" onclick="closeModal()">關閉</button>
+      <button class="btn-close" onclick="closeModal()">關閉視窗</button>
     </div>
   </div>
 
@@ -73,7 +87,7 @@
           document.getElementById('status').innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
           fetchData(profile.userId);
         }
-      } catch (err) { console.error(err); }
+      } catch (err) { console.error("LIFF 初始化失敗", err); }
     };
 
     async function fetchData(userId) {
@@ -81,7 +95,9 @@
         const response = await fetch(`${GAS_URL}?userId=${userId}`);
         allCourses = await response.json();
         render('肌力');
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        document.getElementById('course-list').innerText = "連線失敗，請稍後再試";
+      }
     }
 
     function render(category) {
@@ -122,22 +138,31 @@
       });
     }
 
+    /* --- 即時查詢名單函式 --- */
     async function showUsers(courseId, courseName) {
       const list = document.getElementById('modal-text');
       document.getElementById('modal-title').innerText = courseName + " 預約名單";
-      list.innerHTML = "⏳ 正在同步最新名單...";
+      list.innerHTML = "⏳ 正在取得即時名單...";
       document.getElementById('userModal').style.display = 'block';
 
       try {
+        // 發送帶有 action=getUsers 的請求到 GAS
         const response = await fetch(`${GAS_URL}?action=getUsers&courseId=${courseId}`);
         const users = await response.json();
-        list.innerHTML = users.length > 0 ? users.map((u, i) => `${i + 1}. ${u}`).join('<br>') : "目前尚無人預約";
+        
+        // 確保處理的是字串陣列，避免顯示 [object Object]
+        if (users && Array.isArray(users) && users.length > 0) {
+          list.innerHTML = users.map((u, i) => `${i + 1}. ${u}`).join('<br>');
+        } else {
+          list.innerHTML = "目前尚無人預約";
+        }
       } catch (err) {
-        list.innerHTML = "❌ 查詢失敗";
+        list.innerHTML = "❌ 無法取得名單";
       }
     }
 
     function closeModal() { document.getElementById('userModal').style.display = 'none'; }
+    
     function changeTab(el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
@@ -145,7 +170,7 @@
     }
 
     async function handleAction(id, action) {
-      if (!confirm(action === 'delete' ? "確定要取消預約嗎？" : "確定要預約這堂課程嗎？")) return;
+      if (!confirm(action === 'delete' ? "確定要取消預約並釋出名額嗎？" : "確定要預約這堂課程嗎？")) return;
       try {
         const profile = await liff.getProfile();
         const response = await fetch(GAS_URL, {
