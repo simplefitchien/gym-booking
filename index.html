@@ -22,7 +22,7 @@
     .header-title { font-size: 24px; font-weight: 800; letter-spacing: 1px; margin: 0; color: #333; }
     .user-welcome { font-size: 14px; color: #888; margin-top: 5px; }
 
-    /* 2. 選單更精簡為"肌力"、"有氧" */
+    /* 選單精簡為"肌力"、"有氧" */
     .nav-tabs { 
       display: flex; margin: 20px; background: #E0E6ED; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
@@ -40,22 +40,21 @@
       background: var(--card-bg); border-radius: 25px; padding: 24px; margin-bottom: 20px; 
       box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8);
     }
-    /* 3. 日期前面不要有日曆圖案 */
-    .course-date { font-size: 0.9em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
+    .course-date { font-size: 0.95em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
     .course-title { font-size: 1.4em; font-weight: 900; color: #333; margin: 5px 0; }
     
-    /* 5. 老師的字體加大 */
+    /* 老師字體加大 */
     .teacher-tag { 
       font-size: 1em; background: #F4F7F9; color: var(--secondary); padding: 6px 14px; border-radius: 10px; font-weight: 700;
     }
     
-    /* 4. 時段前面放個小鬧鐘圖示 */
+    /* 時段鬧鐘圖示 */
     .course-detail { font-size: 0.95em; color: #7F8C8D; margin-top: 10px; font-weight: 500; }
     
     .card-footer { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #F2F4F7; }
     .capacity-link { color: #5DADE2; text-decoration: none; cursor: pointer; font-weight: 800; font-size: 0.95em; }
 
-    /* 按鈕大小固定 110x40 */
+    /* 按鈕固定大小 110x40 */
     .btn-book { 
       width: 110px; height: 42px; border-radius: 15px; border: none; font-weight: 800; font-size: 0.95em; 
       cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
@@ -116,15 +115,24 @@
     };
 
     async function fetchData(userId) {
-      const response = await fetch(`${GAS_URL}?userId=${userId}`);
-      allCourses = await response.json();
-      render(document.querySelector('.tab.active').getAttribute('data-cat'));
+      try {
+        const response = await fetch(`${GAS_URL}?userId=${userId}`);
+        allCourses = await response.json();
+        render(document.querySelector('.tab.active').getAttribute('data-cat'));
+      } catch (e) { alert("讀取課表失敗，請稍後再試"); }
     }
 
     function render(category) {
       const container = document.getElementById('course-list');
       container.innerHTML = '';
-      allCourses.filter(c => String(c["分類"]).trim() === String(category).trim()).forEach(c => {
+      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
+        return;
+      }
+
+      filtered.forEach(c => {
         const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
         const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
         const btnId = `btn-${c["課程ID"]}`;
@@ -157,25 +165,29 @@
     async function executeAction(id, action, name, date) {
       const btn = document.getElementById(`btn-${id}`);
       btn.disabled = true; btn.classList.add('btn-loading'); btn.innerHTML = `<div class="btn-spinner"></div>`;
+      
+      // 加入輕微震動回饋 (針對 Android 手機)
+      if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
+
       try {
         const profile = await liff.getProfile();
         const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) });
         const result = await response.json();
-        const msg = result.result;
+        const gasMsg = result.result;
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
         
-        if (msg.includes("成功") || msg.includes("取消")) {
-          // 6. 預約成功改為鉛筆紀錄 / 7. 取消成功改為橡皮擦
+        if (gasMsg.includes("成功") || gasMsg.includes("取消")) {
           if (action === 'book') { 
             iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)"; 
           } else { 
-            iconBox.innerText = "🧼"; titleEl.innerText = "取消完成"; titleEl.style.color = "var(--secondary)"; 
+            // 更換為掃把圖示 🧹
+            iconBox.innerText = "🧹"; titleEl.innerText = "取消完成"; titleEl.style.color = "var(--secondary)"; 
           }
           document.getElementById('result-content').innerText = date + ' ' + name;
         } else {
           iconBox.innerText = "⚠️"; titleEl.innerText = "提醒"; titleEl.style.color = "#E67E22";
-          document.getElementById('result-content').innerText = msg;
+          document.getElementById('result-content').innerText = gasMsg;
         }
         document.getElementById('resultModal').style.display = 'block';
       } catch (err) { location.reload(); }
