@@ -6,7 +6,7 @@
   <title>極簡運動 - 預約系統</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; --danger: #ff4d4d; }
+    :root { --primary: #00b900; --bg: #f8f9fa; --text: #333; --danger: #ff4d4d; --warning: #fbc02d; }
     body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .user-name { font-weight: bold; color: var(--primary); }
@@ -24,29 +24,19 @@
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
     .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 0.85em; }
 
-    /* --- 關鍵修正：鎖定按鈕大小 --- */
+    /* 按鈕大小固定 (110x40) */
     .btn-book { 
-      width: 110px;      /* 核心修正：統一固定寬度，防止撐開 */
-      height: 40px;      /* 核心修正：統一固定高度 */
-      padding: 0;        /* 清除內距由寬高控制 */
-      border-radius: 8px; 
-      border: none; 
-      font-weight: bold; 
-      font-size: 0.95em; 
-      cursor: pointer; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap; /* 防止文字換行 */
+      width: 110px; height: 40px; padding: 0; border-radius: 8px; border: none; 
+      font-weight: bold; font-size: 0.95em; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; white-space: nowrap; 
     }
     .btn-active { background: var(--primary); color: white; }
     .btn-delete { background: var(--danger); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
     .btn-loading { background: #999 !important; opacity: 0.8; cursor: wait !important; }
-    
     .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 5px; }
 
-    /* 彈窗與加載動畫樣式 */
+    /* 彈窗樣式 */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 25% auto; padding: 25px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; }
     .modal-list { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; line-height: 2; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
@@ -128,14 +118,12 @@
       filtered.forEach(c => {
         const current = parseInt(c["目前人數"]) || 0;
         const max = parseInt(c["上限"]) || 0;
-        const isFull = current >= max;
-        const isBooked = c["isBooked"];
         const btnId = `btn-${c["課程ID"]}`;
         const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
 
-        let btnHtml = isBooked 
+        let btnHtml = c["isBooked"] 
           ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`
-          : (isFull ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
+          : (current >= max ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
 
         container.innerHTML += `<div class="card"><div class="card-header"><div><div class="course-date">${dateStr} (${c["星期"]})</div><div class="course-title">${c["名稱"]}</div></div><div class="teacher-tag">${c["老師"]}</div></div><div style="font-size:0.9em; color:#666; margin-top:5px;">⏰ 時段：${c["時段"]}</div><div class="card-footer"><div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">人數：${current} / ${max}</div>${btnHtml}</div></div>`;
       });
@@ -151,15 +139,17 @@
       modal.style.display = 'block';
     }
 
+    /**
+     * 核心修正：精確對接 GAS 回傳訊息 
+     */
     async function executeAction(courseId, action, courseName, courseDate) {
       const btn = document.getElementById(`btn-${courseId}`);
       const statusEl = document.getElementById('status');
       
       btn.disabled = true;
       btn.classList.add('btn-loading');
-      // 插入動畫，文字加上 icon 也不會把按鈕撐大
       btn.innerHTML = `<div class="btn-spinner"></div> 處理中`;
-      statusEl.innerHTML = `<span style="color:#ff5722; font-weight:bold;">⏳ 正在連線中...</span>`;
+      statusEl.innerHTML = `<span style="color:#ff5722; font-weight:bold;">⏳ 正在通訊中...</span>`;
 
       try {
         const profile = await liff.getProfile();
@@ -167,22 +157,33 @@
           method: "POST",
           body: JSON.stringify({ action: action, courseId: courseId, userId: profile.userId, userName: profile.displayName })
         });
+        
         const result = await response.json();
-        const msg = result.result;
+        const gasMsg = result.result; // 直接接住 GAS 回傳的所有字串
 
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
         const contentEl = document.getElementById('result-content');
         
-        if (msg.includes("成功")) {
-          if (action === 'book') { iconBox.innerText = "📝"; titleEl.innerText = "預約成功"; titleEl.style.color = "var(--primary)"; }
-          else { iconBox.innerText = "🗑️"; titleEl.innerText = "取消成功"; titleEl.style.color = "var(--danger)"; }
+        // 邏輯 1：如果是成功的關鍵字
+        if (gasMsg.includes("成功")) {
+          if (action === 'book') { 
+            iconBox.innerText = "📝"; titleEl.innerText = "預約成功"; titleEl.style.color = "var(--primary)"; 
+          } else { 
+            iconBox.innerText = "🗑️"; titleEl.innerText = "取消成功"; titleEl.style.color = "var(--danger)"; 
+          }
           contentEl.innerText = courseDate + ' ' + courseName;
-        } else {
-          iconBox.innerText = "⚠️"; titleEl.innerText = "操作提醒"; titleEl.style.color = "#fbc02d";
-          contentEl.innerText = msg;
+        } 
+        // 邏輯 2：其餘所有情況 (名額已滿、找不到課程、找不到預約紀錄)
+        else {
+          iconBox.innerText = "⚠️"; 
+          titleEl.innerText = "操作提醒"; 
+          titleEl.style.color = "var(--warning)";
+          contentEl.innerText = gasMsg; // 直接呈現 GAS 傳來的原文
         }
+        
         document.getElementById('resultModal').style.display = 'block';
+        statusEl.innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
       } catch (err) { alert("連線失敗"); location.reload(); }
     }
 
