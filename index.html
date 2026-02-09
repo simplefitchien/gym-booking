@@ -12,97 +12,53 @@
       --secondary: #2C3E50;    /* 深海岩石藍 */
       --bg: #F0F4F8;           /* 清透天空灰白 */
       --text: #2C3E50; 
-      --danger: #E74C3C;       /* 活力熱血紅 */
+      --danger: #E74C3C; 
       --card-bg: #FFFFFF;
       --tag-bg: #5DADE2;       /* 晴空藍 */
     }
     body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     
-    /* 標頭改為更有質感的設計 */
-    .header { 
-      background: white; 
-      padding: 25px 20px; 
-      text-align: left; 
-      border-bottom: 1px solid #EAECEF; 
-    }
+    .header { background: white; padding: 25px 20px; text-align: left; border-bottom: 1px solid #EAECEF; }
     .header-title { font-size: 24px; font-weight: 800; letter-spacing: 1px; margin: 0; color: #333; }
     .user-welcome { font-size: 14px; color: #888; margin-top: 5px; }
 
-    /* --- 活力分類切換鈕 --- */
+    /* 2. 選單更精簡為"肌力"、"有氧" */
     .nav-tabs { 
-      display: flex; 
-      margin: 20px; 
-      background: #E0E6ED; 
-      border-radius: 50px; 
-      padding: 5px;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+      display: flex; margin: 20px; background: #E0E6ED; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
     .tab { 
-      flex: 1; 
-      height: 45px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      border-radius: 40px; 
-      font-weight: 700; 
-      font-size: 15px; 
-      color: #7F8C8D; 
-      cursor: pointer; 
-      transition: 0.3s;
+      flex: 1; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 40px; 
+      font-weight: 700; font-size: 16px; color: #7F8C8D; cursor: pointer; transition: 0.3s;
     }
     .tab.active { 
-      background: var(--primary); 
-      color: white; 
-      box-shadow: 0 4px 10px rgba(255, 179, 71, 0.4);
+      background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 179, 71, 0.4);
     }
 
-    /* --- 課程卡片設計 --- */
+    /* 課程卡片 */
     #course-list { padding: 0 20px 80px 20px; }
     .card { 
-      background: var(--card-bg); 
-      border-radius: 25px; 
-      padding: 24px; 
-      margin-bottom: 20px; 
-      box-shadow: 0 10px 20px rgba(0,0,0,0.03); 
-      border: 1px solid rgba(255,255,255,0.8);
+      background: var(--card-bg); border-radius: 25px; padding: 24px; margin-bottom: 20px; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8);
     }
-    .course-date { 
-      font-size: 0.85em; 
-      color: var(--tag-bg); 
-      font-weight: 800; 
-      text-transform: uppercase; 
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-    }
+    /* 3. 日期前面不要有日曆圖案 */
+    .course-date { font-size: 0.9em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
     .course-title { font-size: 1.4em; font-weight: 900; color: #333; margin: 5px 0; }
+    
+    /* 5. 老師的字體加大 */
     .teacher-tag { 
-      font-size: 0.75em; 
-      background: #F4F7F9; 
-      color: #5D6D7E; 
-      padding: 5px 12px; 
-      border-radius: 10px; 
-      font-weight: 600;
-    }
-    .course-detail { font-size: 0.95em; color: #95A5A6; margin-top: 8px; }
-    
-    .card-footer { 
-      margin-top: 20px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding-top: 15px; 
-      border-top: 1px solid #F2F4F7; 
+      font-size: 1em; background: #F4F7F9; color: var(--secondary); padding: 6px 14px; border-radius: 10px; font-weight: 700;
     }
     
-    .capacity-link { color: #5DADE2; text-decoration: none; cursor: pointer; font-weight: 800; font-size: 0.9em; }
+    /* 4. 時段前面放個小鬧鐘圖示 */
+    .course-detail { font-size: 0.95em; color: #7F8C8D; margin-top: 10px; font-weight: 500; }
+    
+    .card-footer { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #F2F4F7; }
+    .capacity-link { color: #5DADE2; text-decoration: none; cursor: pointer; font-weight: 800; font-size: 0.95em; }
 
-    /* --- 按鈕固定大小 110x40 --- */
+    /* 按鈕大小固定 110x40 */
     .btn-book { 
-      width: 110px; height: 42px; border-radius: 15px; border: none; 
-      font-weight: 800; font-size: 0.95em; cursor: pointer; 
-      display: flex; align-items: center; justify-content: center; 
-      transition: 0.2s;
+      width: 110px; height: 42px; border-radius: 15px; border: none; font-weight: 800; font-size: 0.95em; 
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
     }
     .btn-active { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 179, 71, 0.3); }
     .btn-delete { background: var(--secondary); color: white; box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2); }
@@ -110,7 +66,7 @@
     
     .btn-spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.3); border-top: 2.5px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
 
-    /* --- 彈窗設計 (毛玻璃質感) --- */
+    /* 彈窗設計 */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.4); backdrop-filter: blur(8px); }
     .modal-content { background: #fff; margin: 30% auto; padding: 35px; border-radius: 35px; width: 80%; max-width: 320px; text-align: center; }
     .modal-list { text-align: left; margin: 20px 0; max-height: 200px; overflow-y: auto; line-height: 2.5; border-top: 1px solid #F2F4F7; padding-top: 15px; font-size: 15px; }
@@ -126,12 +82,12 @@
 
   <div class="header">
     <h1 class="header-title">探索運動</h1>
-    <div id="status" class="user-welcome">正在取得您的課程資料...</div>
+    <div id="status" class="user-welcome">正在取得資料...</div>
   </div>
   
   <div class="nav-tabs">
-    <div class="tab active" data-cat="肌力" onclick="changeTab(this)">肌力訓練</div>
-    <div class="tab" data-cat="有氧" onclick="changeTab(this)">有氧代謝</div>
+    <div class="tab active" data-cat="肌力" onclick="changeTab(this)">肌力</div>
+    <div class="tab" data-cat="有氧" onclick="changeTab(this)">有氧</div>
   </div>
 
   <div id="course-list">
@@ -154,7 +110,7 @@
       if (!liff.isLoggedIn()) { liff.login(); }
       else { 
         const profile = await liff.getProfile();
-        document.getElementById('status').innerText = `早安，${profile.displayName}！準備好今天的訓練了嗎？`;
+        document.getElementById('status').innerText = `你好，${profile.displayName}！準備好今天的訓練了嗎？`;
         fetchData(profile.userId); 
       }
     };
@@ -175,7 +131,19 @@
         let btnHtml = c["isBooked"] 
           ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`
           : (current >= max ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
-        container.innerHTML += `<div class="card"><div class="course-date">📅 ${dateStr} (${c["星期"]})</div><div style="display:flex; justify-content:space-between; align-items:center;"><div class="course-title">${c["名稱"]}</div><div class="teacher-tag">${c["老師"]}</div></div><div class="course-detail">時段：${c["時段"]}</div><div class="card-footer"><div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>${btnHtml}</div></div>`;
+        
+        container.innerHTML += `<div class="card">
+          <div class="course-date">${dateStr} (${c["星期"]})</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="course-title">${c["名稱"]}</div>
+            <div class="teacher-tag">${c["老師"]}</div>
+          </div>
+          <div class="course-detail">⏰ 時段：${c["時段"]}</div>
+          <div class="card-footer">
+            <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
+            ${btnHtml}
+          </div>
+        </div>`;
       });
     }
 
@@ -196,9 +164,14 @@
         const msg = result.result;
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
+        
         if (msg.includes("成功") || msg.includes("取消")) {
-          if (action === 'book') { iconBox.innerText = "☀️"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)"; }
-          else { iconBox.innerText = "🌊"; titleEl.innerText = "取消完成"; titleEl.style.color = "var(--secondary)"; }
+          // 6. 預約成功改為鉛筆紀錄 / 7. 取消成功改為橡皮擦
+          if (action === 'book') { 
+            iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)"; 
+          } else { 
+            iconBox.innerText = "🧼"; titleEl.innerText = "取消完成"; titleEl.style.color = "var(--secondary)"; 
+          }
           document.getElementById('result-content').innerText = date + ' ' + name;
         } else {
           iconBox.innerText = "⚠️"; titleEl.innerText = "提醒"; titleEl.style.color = "#E67E22";
