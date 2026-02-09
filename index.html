@@ -13,22 +13,40 @@
     .nav-tabs { position: sticky; top: 0; background: white; z-index: 100; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 2px solid #eee; }
     .tab { padding: 8px 20px; font-size: 14px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; color: #666; transition: 0.3s; }
     .tab.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
+    
     #course-list { padding: 15px; padding-bottom: 50px; min-height: 300px; }
     .card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .course-date { font-size: 0.9em; color: #ff5722; font-weight: bold; }
     .course-title { font-size: 1.1em; font-weight: bold; color: #000; }
     .teacher-tag { font-size: 0.8em; background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
+    
     .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #eee; }
     .capacity-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: bold; font-size: 0.85em; }
-    
-    .btn-book { padding: 8px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; min-width: 100px; height: 38px; }
+
+    /* --- 關鍵修正：鎖定按鈕大小 --- */
+    .btn-book { 
+      width: 110px;      /* 核心修正：統一固定寬度，防止撐開 */
+      height: 40px;      /* 核心修正：統一固定高度 */
+      padding: 0;        /* 清除內距由寬高控制 */
+      border-radius: 8px; 
+      border: none; 
+      font-weight: bold; 
+      font-size: 0.95em; 
+      cursor: pointer; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap; /* 防止文字換行 */
+    }
     .btn-active { background: var(--primary); color: white; }
     .btn-delete { background: var(--danger); color: white; }
     .btn-full { background: #d1d1d6; color: white; cursor: not-allowed; }
     .btn-loading { background: #999 !important; opacity: 0.8; cursor: wait !important; }
-    .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+    
+    .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 5px; }
 
+    /* 彈窗與加載動畫樣式 */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 25% auto; padding: 25px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; }
     .modal-list { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; line-height: 2; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
@@ -39,17 +57,12 @@
     .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #999; }
     .spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* 圖示樣式修正 */
     .result-icon { font-size: 60px; margin-bottom: 15px; display: block; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div id="status">極簡運動館</div>
-  </div>
-  
+  <div class="header"><div id="status">極簡運動館</div></div>
   <div class="nav-tabs">
     <div class="tab active" data-cat="肌力" onclick="changeTab(this)">💪 肌力</div>
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">🏃 有氧</div>
@@ -80,7 +93,8 @@
 
   <div id="resultModal" class="modal">
     <div class="modal-content">
-      <span id="result-icon-box" class="result-icon"></span> <h3 id="result-title" style="margin:0;"></h3>
+      <span id="result-icon-box" class="result-icon"></span>
+      <h3 id="result-title" style="margin:0;"></h3>
       <div id="result-content" style="font-size: 1.1em; font-weight: bold; margin: 15px 0; color: #000;"></div>
       <button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button>
     </div>
@@ -140,35 +154,35 @@
     async function executeAction(courseId, action, courseName, courseDate) {
       const btn = document.getElementById(`btn-${courseId}`);
       const statusEl = document.getElementById('status');
+      
       btn.disabled = true;
       btn.classList.add('btn-loading');
-      btn.innerHTML = `<div class="btn-spinner"></div> 處理中...`;
+      // 插入動畫，文字加上 icon 也不會把按鈕撐大
+      btn.innerHTML = `<div class="btn-spinner"></div> 處理中`;
       statusEl.innerHTML = `<span style="color:#ff5722; font-weight:bold;">⏳ 正在連線中...</span>`;
 
       try {
         const profile = await liff.getProfile();
-        await fetch(GAS_URL, {
+        const response = await fetch(GAS_URL, {
           method: "POST",
           body: JSON.stringify({ action: action, courseId: courseId, userId: profile.userId, userName: profile.displayName })
         });
-        
-        // 修正：動態顯示圖示邏輯
+        const result = await response.json();
+        const msg = result.result;
+
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
+        const contentEl = document.getElementById('result-content');
         
-        if (action === 'book') {
-          iconBox.innerText = "📝"; // 預約成功小圖示
-          titleEl.innerText = "預約成功";
-          titleEl.style.color = "var(--primary)";
+        if (msg.includes("成功")) {
+          if (action === 'book') { iconBox.innerText = "📝"; titleEl.innerText = "預約成功"; titleEl.style.color = "var(--primary)"; }
+          else { iconBox.innerText = "🗑️"; titleEl.innerText = "取消成功"; titleEl.style.color = "var(--danger)"; }
+          contentEl.innerText = courseDate + ' ' + courseName;
         } else {
-          iconBox.innerText = "🗑️"; // 取消成功小圖示
-          titleEl.innerText = "取消成功";
-          titleEl.style.color = "var(--danger)";
+          iconBox.innerText = "⚠️"; titleEl.innerText = "操作提醒"; titleEl.style.color = "#fbc02d";
+          contentEl.innerText = msg;
         }
-        
-        document.getElementById('result-content').innerText = courseDate + ' ' + courseName;
         document.getElementById('resultModal').style.display = 'block';
-        statusEl.innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
       } catch (err) { alert("連線失敗"); location.reload(); }
     }
 
