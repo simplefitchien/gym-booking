@@ -7,67 +7,67 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root { 
-      --primary: #5E7153;      /* 鮮豔森林綠 */
-      --primary-dark: #4A5941; 
-      --bg: #E8EAE6;           /* 暖灰泥 */
-      --text: #4A4A4A;         /* 深碳灰 */
-      --danger: #BA797D;       /* 玫瑰鐵鏽粉 */
-      --warning: #D19C75;      /* 焦糖莫蘭迪 */
-      --tag-bg: #89998D;       /* 灰艾草綠 */
+      --primary: #7FB069;      /* 明亮嫩芽綠 */
+      --primary-dark: #6A9457; 
+      --bg: #FFFFFF;           /* 改為純白背景 */
+      --card-bg: #F8F9FA;      /* 極淺灰卡片背景 */
+      --text: #454545;         /* 暖深灰 */
+      --danger: #E6A5A5;       /* 明亮春櫻粉 */
+      --warning: #EDC9AF;      /* 奶油沙漠色 */
+      --tag-bg: #A3B18A;       /* 鼠尾草綠 */
     }
     body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     
-    .header { background: #fff; padding: 20px; text-align: center; border-bottom: 2px solid #D1D1D1; letter-spacing: 3px; font-weight: 600; color: #333; }
-    .user-name { font-weight: bold; color: var(--primary); }
+    .header { background: #fff; padding: 22px; text-align: center; border-bottom: 1px solid #F0F0F0; letter-spacing: 4px; font-weight: 700; color: #333; font-size: 1.1em; }
 
-    /* --- 分類按鈕質感升級 --- */
+    /* --- 明亮分類按鈕 --- */
     .nav-tabs { 
-      display: flex; justify-content: center; gap: 15px; padding: 25px 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex; justify-content: center; gap: 15px; padding: 20px 15px; background: #fff;
     }
     .tab { 
-      flex: 1; max-width: 140px; height: 95px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      border-radius: 24px; border: 2px solid #F0F0F0; background: #FCFCFC; color: #B0B0B0; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      flex: 1; max-width: 140px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      border-radius: 20px; border: 1.5px solid #F0F0F0; background: #FFF; color: #D1D1D1; cursor: pointer; transition: all 0.3s ease;
     }
-    .tab-icon { font-size: 28px; margin-bottom: 6px; opacity: 0.6; filter: grayscale(80%); }
-    .tab-text { font-size: 14px; font-weight: bold; }
+    .tab-icon { font-size: 26px; margin-bottom: 5px; opacity: 0.5; }
+    .tab-text { font-size: 14px; font-weight: 600; }
 
     .tab.active { 
       background: var(--primary); color: #fff; border-color: var(--primary);
-      box-shadow: 0 12px 20px rgba(94, 113, 83, 0.4); transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(127, 176, 105, 0.3); transform: translateY(-3px);
     }
-    .tab.active .tab-icon { opacity: 1; filter: grayscale(0%); }
+    .tab.active .tab-icon { opacity: 1; }
 
-    /* --- 卡片設計 --- */
+    /* --- 清爽卡片設計 --- */
     #course-list { padding: 15px 15px 80px 15px; }
-    .card { background: #fff; border-radius: 20px; padding: 22px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); border: 1px solid #EBEBEB; }
+    .card { background: var(--card-bg); border-radius: 24px; padding: 22px; margin-bottom: 20px; border: 1px solid #F0F0F0; transition: 0.3s; }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .course-date { font-size: 0.9em; color: #A67C52; font-weight: 700; margin-bottom: 4px; }
-    .course-title { font-size: 1.2em; font-weight: 800; color: #2D2D2D; }
-    .teacher-tag { font-size: 0.8em; background: var(--tag-bg); color: #fff; padding: 5px 12px; border-radius: 8px; font-weight: 500; }
-    .course-detail { font-size: 0.95em; color: #777; margin-top: 10px; }
-    .card-footer { margin-top: 18px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #F0F0F0; }
+    .course-date { font-size: 0.9em; color: #BC8F8F; font-weight: 700; margin-bottom: 4px; }
+    .course-title { font-size: 1.25em; font-weight: 800; color: #333; }
+    .teacher-tag { font-size: 0.8em; background: var(--tag-bg); color: #fff; padding: 4px 12px; border-radius: 10px; }
+    .course-detail { font-size: 0.95em; color: #888; margin-top: 10px; }
+    .card-footer { margin-top: 18px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1.5px solid #FFF; }
     
-    .capacity-link { color: #7A9E9F; text-decoration: none; border-bottom: 2px solid #7A9E9F; cursor: pointer; font-weight: 700; font-size: 0.9em; }
+    .capacity-link { color: #82A0AA; text-decoration: none; border-bottom: 2px solid #82A0AA; cursor: pointer; font-weight: 700; font-size: 0.9em; }
 
-    /* --- 按鈕固定大小與對齊 --- */
+    /* --- 按鈕固定大小 110x40 --- */
     .btn-book { 
-      width: 110px; height: 42px; border-radius: 12px; border: none; 
-      font-weight: bold; font-size: 0.95em; cursor: pointer; 
+      width: 110px; height: 40px; border-radius: 14px; border: none; 
+      font-weight: 700; font-size: 0.95em; cursor: pointer; 
       display: flex; align-items: center; justify-content: center; 
     }
-    .btn-active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(94, 113, 83, 0.2); }
-    .btn-delete { background: var(--danger); color: #fff; box-shadow: 0 4px 10px rgba(186, 121, 125, 0.2); }
-    .btn-full { background: #E0E0E0; color: #BBB; cursor: not-allowed; }
-    .btn-loading { background: #999 !important; opacity: 0.8; }
-    .btn-spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.3); border-top: 2.5px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+    .btn-active { background: var(--primary); color: #fff; }
+    .btn-delete { background: var(--danger); color: #fff; }
+    .btn-full { background: #E0E0E0; color: #FFF; cursor: not-allowed; }
+    .btn-loading { background: #D1D1D1 !important; opacity: 0.8; }
+    .btn-spinner { width: 14px; height: 14px; border: 2.5px solid rgba(255,255,255,0.3); border-top: 2.5px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
 
     /* --- 彈窗 --- */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); }
-    .modal-content { background: #fff; margin: 25% auto; padding: 35px; border-radius: 30px; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-    .modal-list { text-align: left; margin: 20px 0; max-height: 200px; overflow-y: auto; line-height: 2.5; border-top: 1px solid #EEE; padding-top: 15px; font-size: 15px; color: #555; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
+    .modal-content { background: #fff; margin: 30% auto; padding: 35px; border-radius: 32px; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.08); border: 1px solid #F0F0F0; }
+    .modal-list { text-align: left; margin: 20px 0; max-height: 200px; overflow-y: auto; line-height: 2.5; border-top: 1px solid #F0F0F0; padding-top: 15px; font-size: 15px; color: #666; }
     .modal-footer { display: flex; gap: 12px; margin-top: 25px; }
-    .btn-modal-cancel { flex: 1; padding: 12px; border-radius: 14px; border: 1.5px solid #EEE; background: #fff; color: #AAA; cursor: pointer; font-weight: bold; }
-    .btn-modal-confirm { flex: 1; padding: 12px; border-radius: 14px; border: none; background: var(--primary); color: #fff; cursor: pointer; font-weight: bold; }
+    .btn-modal-cancel { flex: 1; padding: 12px; border-radius: 16px; border: 1.5px solid #F0F0F0; background: #fff; color: #BBB; cursor: pointer; font-weight: bold; }
+    .btn-modal-confirm { flex: 1; padding: 12px; border-radius: 16px; border: none; background: var(--primary); color: #fff; cursor: pointer; font-weight: bold; }
     
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .result-icon { font-size: 70px; margin-bottom: 15px; display: block; }
@@ -75,25 +75,25 @@
 </head>
 <body>
 
-  <div class="header">「 極 簡 運 動 館 」</div>
+  <div class="header">極 簡 運 動 館</div>
   
   <div class="nav-tabs">
     <div class="tab active" data-cat="肌力" onclick="changeTab(this)">
       <div class="tab-icon">💪</div>
-      <div class="tab-text">肌力訓練</div>
+      <div class="tab-text">肌力</div>
     </div>
     <div class="tab" data-cat="有氧" onclick="changeTab(this)">
       <div class="tab-icon">🏃</div>
-      <div class="tab-text">有氧代謝</div>
+      <div class="tab-text">有氧</div>
     </div>
   </div>
 
   <div id="course-list">
-    <div style="text-align:center; padding:100px; color:#BBB;"><div class="btn-spinner" style="border-top-color:var(--primary); margin:0 auto 10px;"></div>載入課表中...</div>
+    <div style="text-align:center; padding:100px; color:#DDD;"><div class="btn-spinner" style="border-top-color:var(--primary); margin:0 auto 10px;"></div>同步中...</div>
   </div>
 
-  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0;">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" style="width:100%; border-radius:14px;" onclick="closeModal('userModal')">關閉</button></div></div>
-  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:#999; font-weight:400;">操作確認</h3><p id="confirm-msg" style="font-size: 1.2em; font-weight: 800; color: #333;"></p><div class="modal-footer"><button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
+  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:600;">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" style="width:100%; border-radius:16px;" onclick="closeModal('userModal')">關閉</button></div></div>
+  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:#CCC; font-weight:400;">操作確認</h3><p id="confirm-msg" style="font-size: 1.2em; font-weight: 800; color: #333;"></p><div class="modal-footer"><button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
   <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" class="result-icon"></span><h3 id="result-title" style="margin:0;"></h3><div id="result-content" style="font-size: 1.1em; font-weight: 700; margin: 15px 0; color: #333;"></div><button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button></div></div>
 
   <script>
@@ -125,7 +125,7 @@
           ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`
           : (current >= max ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
 
-        container.innerHTML += `<div class="card"><div class="card-header"><div><div class="course-date">${dateStr} (${c["星期"]})</div><div class="course-title">${c["名稱"]}</div></div><div class="teacher-tag">${c["老師"]}</div></div><div class="course-detail">⏰ 時段：${c["時段"]}</div><div class="card-footer"><div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>${btnHtml}</div></div>`;
+        container.innerHTML += `<div class="card"><div class="card-header"><div><div class="course-date">${dateStr} (${c["星期"]})</div><div class="course-title">${c["名稱"]}</div></div><div class="teacher-tag">${c["老師"]}</div></div><div class="course-detail">時段：${c["時段"]}</div><div class="card-footer"><div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>${btnHtml}</div></div>`;
       });
     }
 
@@ -146,7 +146,6 @@
         const msg = result.result;
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
-        
         if (msg.includes("成功") || msg.includes("取消")) {
           if (action === 'book') { iconBox.innerText = "📝"; titleEl.innerText = "預約成功"; titleEl.style.color = "var(--primary)"; }
           else { iconBox.innerText = "🗑️"; titleEl.innerText = "取消成功"; titleEl.style.color = "var(--danger)"; }
