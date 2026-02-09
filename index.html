@@ -31,8 +31,6 @@
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 25% auto; padding: 20px; border-radius: 15px; width: 75%; max-width: 300px; text-align: center; }
     .modal-list { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; line-height: 2; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
-    
-    /* 自定義確認彈窗按鈕組 */
     .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
     .btn-modal-cancel { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f1f1f1; cursor: pointer; font-weight: bold; }
     .btn-modal-confirm { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
@@ -70,11 +68,19 @@
     </div>
   </div>
 
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <h3 id="result-title" style="margin-top:0; color:var(--primary);">預約完成</h3>
+      <div id="result-content" style="font-size: 1.1em; font-weight: bold; margin: 15px 0; color: #000;"></div>
+      <p style="font-size: 0.9em; color: #666;">系統已自動更新您的預約紀錄。</p>
+      <button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button>
+    </div>
+  </div>
+
   <script>
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
     let allCourses = [];
-    let pendingAction = null; // 用來存暫存的操作資訊
 
     window.onload = async function() {
       await liff.init({ liffId: LIFF_ID });
@@ -103,16 +109,17 @@
         const isFull = current >= max;
         const isBooked = c["isBooked"];
         const btnId = `btn-${c["課程ID"]}`;
+        const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
 
         let btnHtml = isBooked 
-          ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}')">取消預約</button>`
-          : (isFull ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}')">立即預約</button>`);
+          ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`
+          : (isFull ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
 
         container.innerHTML += `
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="course-date">${c["日期"]} (${c["星期"]})</div>
+                <div class="course-date">${dateStr} (${c["星期"]})</div>
                 <div class="course-title">${c["名稱"]}</div>
               </div>
               <div class="teacher-tag">${c["老師"]}</div>
@@ -127,33 +134,31 @@
     }
 
     /**
-     * 第一步：顯示自定義確認彈窗
+     * 第一步：操作確認
      */
-    function askAction(courseId, action, courseName) {
+    function askAction(courseId, action, courseName, courseDate) {
       const modal = document.getElementById('confirmModal');
-      const msg = action === 'delete' ? `確定要取消「${courseName}」並釋出名額嗎？` : `確定要預約「${courseName}」嗎？`;
+      const msg = action === 'delete' ? `確定要取消「${courseDate} ${courseName}」並釋出名額嗎？` : `確定要預約「${courseDate} ${courseName}」嗎？`;
       document.getElementById('confirm-msg').innerText = msg;
       
-      // 綁定確定按鈕的行為
       document.getElementById('btn-do-action').onclick = function() {
         closeModal('confirmModal');
-        executeAction(courseId, action);
+        executeAction(courseId, action, courseName, courseDate);
       };
-      
       modal.style.display = 'block';
     }
 
     /**
-     * 第二步：正式執行通訊
+     * 第二步：執行與顯示自定義結果
      */
-    async function executeAction(courseId, action) {
+    async function executeAction(courseId, action, courseName, courseDate) {
       const btn = document.getElementById(`btn-${courseId}`);
       const statusEl = document.getElementById('status');
       
       btn.disabled = true;
       btn.innerText = "⏳ 處理中...";
       btn.classList.add('btn-loading');
-      statusEl.innerHTML = `<span style="color:#ff5722; font-weight:bold;">⏳ 正在通訊中，請勿離開...</span>`;
+      statusEl.innerHTML = `<span style="color:#ff5722; font-weight:bold;">⏳ 正在通訊中，請稍候...</span>`;
 
       try {
         const profile = await liff.getProfile();
@@ -162,8 +167,14 @@
           body: JSON.stringify({ action: action, courseId: courseId, userId: profile.userId, userName: profile.displayName })
         });
         const result = await response.json();
-        alert(result.result);
-        location.reload(); 
+        
+        // 成功後顯示自定義彈窗，不再用 alert
+        document.getElementById('result-title').innerText = action === 'book' ? "預約成功" : "取消成功";
+        document.getElementById('result-title').style.color = action === 'book' ? "var(--primary)" : "var(--danger)";
+        document.getElementById('result-content').innerText = `${courseDate} ${courseName}\n${action === 'book' ? '預約成功！' : '預約已取消'}`;
+        
+        document.getElementById('resultModal').style.display = 'block';
+        statusEl.innerHTML = `你好，<span class="user-name">${profile.displayName}</span>`;
       } catch (err) {
         alert("連線失敗");
         location.reload();
@@ -173,7 +184,7 @@
     async function showUsers(courseId, courseName) {
       const list = document.getElementById('modal-text');
       document.getElementById('modal-title').innerText = courseName + " 預約名單";
-      list.innerHTML = "⏳ 正在同步最新名單...";
+      list.innerHTML = "⏳ 正在取得即時名單...";
       document.getElementById('userModal').style.display = 'block';
       try {
         const response = await fetch(`${GAS_URL}?action=getUsers&courseId=${courseId}`);
