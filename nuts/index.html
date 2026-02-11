@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Sports Center - 堅果團購</title>
+    <title>極簡運動 - 堅果訂購系統</title>
     <style>
         :root { --primary-color: #000; --bg-color: #f8f8f8; }
         body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
@@ -33,7 +33,7 @@
         <p class="subtitle">Minimalist Sports Center</p>
         
         <div class="name-section">
-            <input type="text" id="studentName" placeholder="請輸入您的學員姓名">
+            <input type="text" id="studentName" placeholder="請輸入您的姓名">
         </div>
 
         <div class="item-list" id="productList">
@@ -113,7 +113,7 @@
                     mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
-                alert('訂購成功！請記得準時繳費。');
+                alert('訂購成功！到貨繳費。');
                 location.reload();
             } catch (e) {
                 alert('傳送失敗，請稍後再試');
