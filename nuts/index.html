@@ -3,63 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>極簡運動 - 堅果訂購</title>
+    <title>極簡運動 - 堅果訂購系統</title>
     <style>
-        :root { --primary-color: #000; --bg-color: #f8f8f8; }
-        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
-        h2 { text-align: center; font-weight: 600; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 24px; }
+        :root { --primary-color: #000; --bg-color: #f8f8f8; --accent-color: #333; }
         
-        /* 列表樣式 */
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+        body { 
+            font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; 
+            background: var(--bg-color); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        .container { 
+            background: white; 
+            width: 100%; 
+            max-width: 450px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            overflow: hidden; 
+            position: relative;
+        }
+
+        /* 質感化標題區塊 */
+        .header-box {
+            background: linear-gradient(135deg, #1a1a1a 0%, #444 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header-box h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .header-box .subtitle {
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* 內容區塊 */
+        .content { padding: 24px; }
+
+        .name-section { margin-bottom: 24px; }
+        
+        input[type="text"] { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid #eee; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 1rem; 
+            background: #fafafa; 
+            transition: 0.3s;
+        }
+        
+        input[type="text"]:focus { 
+            outline: none; 
+            border-color: #ccc; 
+            background: #fff; 
+        }
+
+        .item-list { margin-bottom: 20px; }
+
+        .item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 0; 
+            border-bottom: 1px solid #f0f0f0; 
+        }
+        
+        .item-info { flex-grow: 1; }
         .item-name { font-weight: 500; font-size: 1.1rem; color: #333; }
         .item-price { color: #888; font-size: 0.9rem; margin-top: 2px; }
         
-        /* 控制按鈕 */
         .qty-control { display: flex; align-items: center; gap: 15px; }
-        .qty-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #eee; background: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-btn { 
+            width: 34px; 
+            height: 34px; 
+            border-radius: 8px; 
+            border: 1px solid #eee; 
+            background: #fff; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s;
+        }
+        .qty-btn:active { background: #f5f5f5; }
         .qty-num { min-width: 24px; text-align: center; font-weight: 600; font-size: 1.1rem; }
         
-        /* 輸入框 */
-        input[type="text"] { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 1rem; background: #fafafa; margin-bottom: 24px; }
-        
         /* 底部 */
-        .footer { position: sticky; bottom: 0; background: white; padding-top: 20px; border-top: 1px solid #eee; margin-top: 10px; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold; }
-        .submit-btn { width: 100%; padding: 18px; background: var(--primary-color); color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .footer { 
+            background: white; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            margin-top: 10px; 
+        }
+        
+        .total-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+        }
+        
+        .submit-btn { 
+            width: 100%; 
+            padding: 18px; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 14px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        .submit-btn:active { opacity: 0.8; }
+        .submit-btn:disabled { background: #ccc; }
 
-        /* --- 自定義對話框樣式 --- */
+        /* 自定義對話框 */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1000;
+            background: rgba(0,0,0,0.5); display: none; align-items: center; 
+            justify-content: center; z-index: 1000;
         }
         .modal { 
             background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 300px; 
-            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
-            transform: translateY(20px); transition: 0.3s;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        .modal h3 { margin-top: 0; color: #333; }
-        .modal p { color: #666; font-size: 0.95rem; line-height: 1.5; }
+        .modal h3 { margin-top: 0; color: #333; font-size: 1.2rem; }
+        .modal p { color: #666; font-size: 0.95rem; line-height: 1.6; margin: 15px 0; }
         .modal-btn { 
-            margin-top: 20px; width: 100%; padding: 12px; 
-            background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+            width: 100%; padding: 12px; background: var(--primary-color); 
+            color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>堅果團購</h2>
-        <p class="subtitle">第一週登記，第二週結單</p>
+        <div class="header-box">
+            <h2>堅果團購</h2>
+            <div class="subtitle">第一週登記 · 第二週結單</div>
+        </div>
         
-        <input type="text" id="studentName" placeholder="請輸入您的姓名">
+        <div class="content">
+            <div class="name-section">
+                <input type="text" id="studentName" placeholder="請輸入您的姓名">
+            </div>
 
-        <div class="item-list" id="productList"></div>
+            <div class="item-list" id="productList"></div>
 
-        <div class="footer">
-            <div class="total-row"><span>預估金額</span><span id="totalPrice">$ 0</span></div>
-            <button class="submit-btn" onclick="sendOrder()" id="btnSubmit">確認訂購</button>
+            <div class="footer">
+                <div class="total-row">
+                    <span>預估金額</span>
+                    <span id="totalPrice">$ 0</span>
+                </div>
+                <button class="submit-btn" onclick="sendOrder()" id="btnSubmit">確認訂購</button>
+            </div>
         </div>
     </div>
 
@@ -84,6 +198,7 @@
         ];
 
         let cart = {};
+        // 請務必將下方換成你的 GAS Web App URL
         const GAS_URL = '您的_GAS_部署網址'; 
 
         function init() {
@@ -92,7 +207,10 @@
                 cart[p.id] = 0;
                 listEl.innerHTML += `
                     <div class="item">
-                        <div class="item-info"><div class="item-name">${p.name}</div><div class="item-price">$${p.price}</div></div>
+                        <div class="item-info">
+                            <div class="item-name">${p.name}</div>
+                            <div class="item-price">$${p.price}</div>
+                        </div>
                         <div class="qty-control">
                             <button class="qty-btn" onclick="updateQty('${p.id}', -1)">−</button>
                             <span class="qty-num" id="qty-${p.id}">0</span>
@@ -115,12 +233,12 @@
             return total;
         }
 
-        // --- 對話框控制邏輯 ---
+        // 對話框控制
         function showModal(title, msg, isSuccess = false) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMsg').innerText = msg;
             document.getElementById('modalOverlay').style.display = 'flex';
-            if(isSuccess) window.isPendingReload = true; // 標記成功，關閉後重整
+            if(isSuccess) window.isPendingReload = true;
         }
 
         function closeModal() {
@@ -138,14 +256,17 @@
             document.getElementById('btnSubmit').innerText = '傳送中...';
 
             try {
+                // 將資料傳送到 GAS
                 await fetch(GAS_URL, {
-                    method: 'POST', mode: 'no-cors',
+                    method: 'POST',
+                    mode: 'no-cors',
                     body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
                 });
-                showModal('訂購成功', '已收到您的預訂，請於到貨後至櫃檯繳費', true);
+                showModal('訂購成功', '已收到您的預訂，到貨繳費。', true);
             } catch (e) {
-                showModal('錯誤', '傳送失敗，請稍後再試');
+                showModal('錯誤', '網路傳送失敗，請稍後再試。');
                 document.getElementById('btnSubmit').disabled = false;
+                document.getElementById('btnSubmit').innerText = '確認訂購';
             }
         }
         init();
