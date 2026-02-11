@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Sports Center - 堅果團購</title>
+    <style>
+        :root { --primary-color: #000; --bg-color: #f8f8f8; }
+        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { text-align: center; font-weight: 600; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 24px; }
+        .item-list { margin-bottom: 20px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .item-info { flex-grow: 1; }
+        .item-name { font-weight: 500; font-size: 1.05rem; }
+        .item-price { color: #888; font-size: 0.9rem; }
+        .qty-control { display: flex; align-items: center; gap: 12px; }
+        .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:active { background: #eee; }
+        .qty-num { min-width: 20px; text-align: center; font-weight: 600; }
+        .name-section { margin-bottom: 20px; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
+        .footer { position: sticky; bottom: 0; background: white; padding-top: 15px; border-top: 1px solid #eee; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; }
+        .submit-btn { width: 100%; padding: 16px; background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .submit-btn:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌰 堅果月初團購</h2>
+        <p class="subtitle">Minimalist Sports Center</p>
+        
+        <div class="name-section">
+            <input type="text" id="studentName" placeholder="請輸入您的學員姓名">
+        </div>
+
+        <div class="item-list" id="productList">
+            </div>
+
+        <div class="footer">
+            <div class="total-row">
+                <span>預估金額</span>
+                <span id="totalPrice">$ 0</span>
+            </div>
+            <button class="submit-btn" onclick="sendOrder()" id="btnSubmit">確認訂購</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 'mix', name: '綜合堅果', price: 330 },
+            { id: 'almond', name: '杏仁', price: 250 },
+            { id: 'walnut', name: '核桃', price: 270 },
+            { id: 'pecan', name: '胡桃', price: 400 },
+            { id: 'pumpkin', name: '南瓜子', price: 180 },
+            { id: 'pistachio', name: '開心果', price: 320 },
+            { id: 'macadamia', name: '夏威夷豆', price: 500 },
+            { id: 'cashew', name: '腰果', price: 300 }
+        ];
+
+        let cart = {};
+        const GAS_URL = '您的_GAS_部署網址'; 
+
+        function init() {
+            const listEl = document.getElementById('productList');
+            products.forEach(p => {
+                cart[p.id] = 0;
+                listEl.innerHTML += `
+                    <div class="item">
+                        <div class="item-info">
+                            <div class="item-name">${p.name}</div>
+                            <div class="item-price">$${p.price}</div>
+                        </div>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
+                            <span class="qty-num" id="qty-${p.id}">0</span>
+                            <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateQty(id, delta) {
+            cart[id] = Math.max(0, cart[id] + delta);
+            document.getElementById(`qty-${id}`).innerText = cart[id];
+            calculate();
+        }
+
+        function calculate() {
+            let total = 0;
+            products.forEach(p => { total += cart[p.id] * p.price; });
+            document.getElementById('totalPrice').innerText = `$ ${total}`;
+            return total;
+        }
+
+        async function sendOrder() {
+            const name = document.getElementById('studentName').value;
+            const total = calculate();
+            if (!name) return alert('請填寫姓名');
+            if (total === 0) return alert('請選擇至少一項產品');
+
+            document.getElementById('btnSubmit').disabled = true;
+            document.getElementById('btnSubmit').innerText = '傳送中...';
+
+            const payload = { userName: name, ...cart, totalPrice: total };
+
+            try {
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                });
+                alert('訂購成功！請記得準時繳費。');
+                location.reload();
+            } catch (e) {
+                alert('傳送失敗，請稍後再試');
+                document.getElementById('btnSubmit').disabled = false;
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
