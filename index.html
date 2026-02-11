@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡運動 - 預約系統</title>
+  <title>極簡運動 - 課程預約系統</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root { 
@@ -109,7 +109,7 @@
       if (!liff.isLoggedIn()) { liff.login(); }
       else { 
         const profile = await liff.getProfile();
-        document.getElementById('status').innerText = `你好，${profile.displayName}！準備好今天的訓練了嗎？`;
+        document.getElementById('status').innerText = `您好，${profile.displayName}！準備好今天的訓練了嗎？`;
         fetchData(profile.userId); 
       }
     };
@@ -213,4 +213,5 @@
   </script>
 </body>
 </html>
+
 
