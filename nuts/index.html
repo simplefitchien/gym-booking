@@ -279,7 +279,7 @@
                     mode: 'no-cors',
                     body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
                 });
-                showModal('訂購成功', '已收到您的預訂，請於到貨後至櫃檯繳費。', true);
+                showModal('訂購成功', '已收到您的預訂，到貨通知繳費。', true);
             } catch (e) {
                 showModal('錯誤', '網路傳送失敗，請稍後再試。');
                 btn.disabled = false;
