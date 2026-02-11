@@ -3,48 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>極簡運動 - 堅果訂購系統</title>
+    <title>極簡運動 - 堅果訂購</title>
     <style>
         :root { --primary-color: #000; --bg-color: #f8f8f8; }
         body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .container { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative; }
         h2 { text-align: center; font-weight: 600; margin-bottom: 8px; }
         .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 24px; }
-        .item-list { margin-bottom: 20px; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .item-info { flex-grow: 1; }
-        .item-name { font-weight: 500; font-size: 1.05rem; }
-        .item-price { color: #888; font-size: 0.9rem; }
-        .qty-control { display: flex; align-items: center; gap: 12px; }
-        .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .qty-btn:active { background: #eee; }
-        .qty-num { min-width: 20px; text-align: center; font-weight: 600; }
-        .name-section { margin-bottom: 20px; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
-        .footer { position: sticky; bottom: 0; background: white; padding-top: 15px; border-top: 1px solid #eee; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; }
-        .submit-btn { width: 100%; padding: 16px; background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .submit-btn:disabled { background: #ccc; }
+        
+        /* 列表樣式 */
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+        .item-name { font-weight: 500; font-size: 1.1rem; color: #333; }
+        .item-price { color: #888; font-size: 0.9rem; margin-top: 2px; }
+        
+        /* 控制按鈕 */
+        .qty-control { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #eee; background: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-num { min-width: 24px; text-align: center; font-weight: 600; font-size: 1.1rem; }
+        
+        /* 輸入框 */
+        input[type="text"] { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 1rem; background: #fafafa; margin-bottom: 24px; }
+        
+        /* 底部 */
+        .footer { position: sticky; bottom: 0; background: white; padding-top: 20px; border-top: 1px solid #eee; margin-top: 10px; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold; }
+        .submit-btn { width: 100%; padding: 18px; background: var(--primary-color); color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+
+        /* --- 自定義對話框樣式 --- */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal { 
+            background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 300px; 
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+            transform: translateY(20px); transition: 0.3s;
+        }
+        .modal h3 { margin-top: 0; color: #333; }
+        .modal p { color: #666; font-size: 0.95rem; line-height: 1.5; }
+        .modal-btn { 
+            margin-top: 20px; width: 100%; padding: 12px; 
+            background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h2>🌰 堅果團購</h2>
+        <h2>堅果團購</h2>
         <p class="subtitle">第一週登記，第二週結單</p>
         
-        <div class="name-section">
-            <input type="text" id="studentName" placeholder="請輸入您的姓名">
-        </div>
+        <input type="text" id="studentName" placeholder="請輸入您的姓名">
 
-        <div class="item-list" id="productList">
-            </div>
+        <div class="item-list" id="productList"></div>
 
         <div class="footer">
-            <div class="total-row">
-                <span>預估金額</span>
-                <span id="totalPrice">$ 0</span>
-            </div>
+            <div class="total-row"><span>預估金額</span><span id="totalPrice">$ 0</span></div>
             <button class="submit-btn" onclick="sendOrder()" id="btnSubmit">確認訂購</button>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <h3 id="modalTitle">通知</h3>
+            <p id="modalMsg"></p>
+            <button class="modal-btn" onclick="closeModal()">確定</button>
         </div>
     </div>
 
@@ -69,17 +92,13 @@
                 cart[p.id] = 0;
                 listEl.innerHTML += `
                     <div class="item">
-                        <div class="item-info">
-                            <div class="item-name">${p.name}</div>
-                            <div class="item-price">$${p.price}</div>
-                        </div>
+                        <div class="item-info"><div class="item-name">${p.name}</div><div class="item-price">$${p.price}</div></div>
                         <div class="qty-control">
-                            <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
+                            <button class="qty-btn" onclick="updateQty('${p.id}', -1)">−</button>
                             <span class="qty-num" id="qty-${p.id}">0</span>
                             <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
@@ -96,27 +115,36 @@
             return total;
         }
 
+        // --- 對話框控制邏輯 ---
+        function showModal(title, msg, isSuccess = false) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMsg').innerText = msg;
+            document.getElementById('modalOverlay').style.display = 'flex';
+            if(isSuccess) window.isPendingReload = true; // 標記成功，關閉後重整
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            if(window.isPendingReload) location.reload();
+        }
+
         async function sendOrder() {
             const name = document.getElementById('studentName').value;
             const total = calculate();
-            if (!name) return alert('請填寫姓名');
-            if (total === 0) return alert('請選擇至少一項產品');
+            if (!name) return showModal('提示', '請填寫姓名後再訂購');
+            if (total === 0) return showModal('提示', '請至少選擇一項產品');
 
             document.getElementById('btnSubmit').disabled = true;
             document.getElementById('btnSubmit').innerText = '傳送中...';
 
-            const payload = { userName: name, ...cart, totalPrice: total };
-
             try {
                 await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
                 });
-                alert('訂購成功！到貨繳費。');
-                location.reload();
+                showModal('訂購成功', '已收到您的預訂，請於到貨後至櫃檯繳費', true);
             } catch (e) {
-                alert('傳送失敗，請稍後再試');
+                showModal('錯誤', '傳送失敗，請稍後再試');
                 document.getElementById('btnSubmit').disabled = false;
             }
         }
