@@ -177,12 +177,12 @@
         const iconBox = document.getElementById('result-icon-box');
         const titleEl = document.getElementById('result-title');
         
-        if (gasMsg.includes("成功") || gasMsg.includes("取消")) {
+        if (gasMsg.includes("成功")) {
           if (action === 'book') { 
             iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)"; 
           } else { 
             // 更換為掃把圖示 🧹
-            iconBox.innerText = "🧹"; titleEl.innerText = "取消完成"; titleEl.style.color = "var(--secondary)"; 
+            iconBox.innerText = "🧹"; titleEl.innerText = "取消成功!"; titleEl.style.color = "var(--secondary)"; 
           }
           document.getElementById('result-content').innerText = date + ' ' + name;
         } else {
@@ -213,3 +213,4 @@
   </script>
 </body>
 </html>
+
