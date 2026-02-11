@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>極簡運動 - 堅果訂購系統</title>
     <style>
-        :root { --primary-color: #000; --bg-color: #f8f8f8; --accent-color: #333; }
+        /* --- 活力莫蘭迪配色定義 --- */
+        :root { 
+            --primary-color: #D66D5B;       /* 主色：莫蘭迪陶土紅 (用於按鈕) */
+            --gradient-start: #E29587;      /* 漸層起點：莫蘭迪珊瑚粉 */
+            --gradient-end: #C05544;        /* 漸層終點：深陶土色 */
+            --bg-color: #f9f9f9;            /* 背景：極淺米灰 */
+            --text-primary: #444444;        /* 主要文字：柔和深灰 */
+            --text-secondary: #888888;      /* 次要文字：中灰色 */
+            --border-color: #eeeeee;        /* 邊框色 */
+        }
         
         body { 
             font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; 
@@ -14,21 +23,22 @@
             padding: 20px; 
             display: flex; 
             justify-content: center; 
+            color: var(--text-primary);
         }
 
         .container { 
             background: white; 
             width: 100%; 
             max-width: 450px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            border-radius: 24px; /* 圓角稍微加大一點，更柔和 */
+            box-shadow: 0 15px 35px rgba(214, 109, 91, 0.1); /* 陰影帶一點點主色調 */
             overflow: hidden; 
             position: relative;
         }
 
-        /* 質感化標題區塊 */
+        /* 質感化標題區塊 - 活力莫蘭迪漸層 */
         .header-box {
-            background: linear-gradient(135deg, #1a1a1a 0%, #444 100%);
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             padding: 40px 20px;
             text-align: center;
             color: white;
@@ -37,15 +47,16 @@
         .header-box h2 {
             margin: 0;
             font-size: 1.6rem;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 增加一點立體感 */
         }
 
         .header-box .subtitle {
             margin-top: 10px;
-            color: #aaa;
-            font-size: 0.85rem;
-            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9); /* 白色稍微透明，融合背景 */
+            font-size: 0.9rem;
+            font-weight: 400;
             letter-spacing: 1px;
         }
 
@@ -57,17 +68,18 @@
         input[type="text"] { 
             width: 100%; 
             padding: 14px; 
-            border: 1px solid #eee; 
+            border: 1px solid var(--border-color); 
             border-radius: 12px; 
             box-sizing: border-box; 
             font-size: 1rem; 
             background: #fafafa; 
             transition: 0.3s;
+            color: var(--text-primary);
         }
         
         input[type="text"]:focus { 
             outline: none; 
-            border-color: #ccc; 
+            border-color: var(--gradient-start); /* 聚焦時邊框變為主色調 */
             background: #fff; 
         }
 
@@ -78,35 +90,36 @@
             justify-content: space-between; 
             align-items: center; 
             padding: 16px 0; 
-            border-bottom: 1px solid #f0f0f0; 
+            border-bottom: 1px solid var(--border-color); 
         }
         
         .item-info { flex-grow: 1; }
-        .item-name { font-weight: 500; font-size: 1.1rem; color: #333; }
-        .item-price { color: #888; font-size: 0.9rem; margin-top: 2px; }
+        .item-name { font-weight: 500; font-size: 1.1rem; color: var(--text-primary); }
+        .item-price { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
         
         .qty-control { display: flex; align-items: center; gap: 15px; }
         .qty-btn { 
             width: 34px; 
             height: 34px; 
-            border-radius: 8px; 
-            border: 1px solid #eee; 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
             background: #fff; 
             font-size: 1.2rem; 
+            color: var(--text-primary);
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             transition: 0.2s;
         }
-        .qty-btn:active { background: #f5f5f5; }
+        .qty-btn:active { background: #f0f0f0; color: var(--primary-color); border-color: var(--primary-color); }
         .qty-num { min-width: 24px; text-align: center; font-weight: 600; font-size: 1.1rem; }
         
         /* 底部 */
         .footer { 
             background: white; 
             padding-top: 20px; 
-            border-top: 1px solid #eee; 
+            border-top: 1px solid var(--border-color); 
             margin-top: 10px; 
         }
         
@@ -117,8 +130,10 @@
             margin-bottom: 20px; 
             font-size: 1.2rem; 
             font-weight: bold; 
+            color: var(--text-primary);
         }
         
+        /* 主按鈕使用新的主色調 */
         .submit-btn { 
             width: 100%; 
             padding: 18px; 
@@ -129,26 +144,29 @@
             font-size: 1.1rem; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: 0.2s; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 12px rgba(214, 109, 91, 0.3); /* 增加柔和的同色系陰影 */
         }
-        .submit-btn:active { opacity: 0.8; }
-        .submit-btn:disabled { background: #ccc; }
+        .submit-btn:active { transform: scale(0.98); box-shadow: none; }
+        .submit-btn:disabled { background: #ccc; box-shadow: none; color: #fff; }
 
         /* 自定義對話框 */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.5); display: none; align-items: center; 
             justify-content: center; z-index: 1000;
+            backdrop-filter: blur(2px); /* 背景稍微模糊，增加質感 */
         }
         .modal { 
-            background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 300px; 
+            background: white; padding: 32px; border-radius: 24px; width: 80%; max-width: 320px; 
             text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        .modal h3 { margin-top: 0; color: #333; font-size: 1.2rem; }
-        .modal p { color: #666; font-size: 0.95rem; line-height: 1.6; margin: 15px 0; }
+        .modal h3 { margin-top: 0; color: var(--text-primary); font-size: 1.3rem; font-weight: 700; }
+        .modal p { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin: 16px 0 24px 0; }
         .modal-btn { 
-            width: 100%; padding: 12px; background: var(--primary-color); 
-            color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+            width: 100%; padding: 14px; background: var(--primary-color); 
+            color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(214, 109, 91, 0.2);
         }
     </style>
 </head>
@@ -156,7 +174,7 @@
 
     <div class="container">
         <div class="header-box">
-            <h2>堅果團購</h2>
+            <h2>🌰堅果團購</h2>
             <div class="subtitle">第一週登記 · 第二週結單</div>
         </div>
         
@@ -198,7 +216,7 @@
         ];
 
         let cart = {};
-        // 請務必將下方換成你的 GAS Web App URL
+        // ★★★ 請記得替換這裡的 GAS URL ★★★
         const GAS_URL = '您的_GAS_部署網址'; 
 
         function init() {
@@ -237,13 +255,22 @@
         function showModal(title, msg, isSuccess = false) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMsg').innerText = msg;
-            document.getElementById('modalOverlay').style.display = 'flex';
+            const overlay = document.getElementById('modalOverlay');
+            overlay.style.display = 'flex';
+            // 簡單的淡入動畫
+            overlay.style.opacity = 0;
+            setTimeout(() => overlay.style.opacity = 1, 10);
+            
             if(isSuccess) window.isPendingReload = true;
         }
 
         function closeModal() {
-            document.getElementById('modalOverlay').style.display = 'none';
-            if(window.isPendingReload) location.reload();
+            const overlay = document.getElementById('modalOverlay');
+            overlay.style.opacity = 0;
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                if(window.isPendingReload) location.reload();
+            }, 300); // 等待動畫結束
         }
 
         async function sendOrder() {
@@ -252,21 +279,21 @@
             if (!name) return showModal('提示', '請填寫姓名後再訂購');
             if (total === 0) return showModal('提示', '請至少選擇一項產品');
 
-            document.getElementById('btnSubmit').disabled = true;
-            document.getElementById('btnSubmit').innerText = '傳送中...';
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerText = '傳送中...';
 
             try {
-                // 將資料傳送到 GAS
                 await fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
                 });
-                showModal('訂購成功', '已收到您的預訂，到貨繳費。', true);
+                showModal('訂購成功', '已收到您的預訂，請於到貨後至櫃檯繳費。', true);
             } catch (e) {
                 showModal('錯誤', '網路傳送失敗，請稍後再試。');
-                document.getElementById('btnSubmit').disabled = false;
-                document.getElementById('btnSubmit').innerText = '確認訂購';
+                btn.disabled = false;
+                btn.innerText = '確認訂購';
             }
         }
         init();
