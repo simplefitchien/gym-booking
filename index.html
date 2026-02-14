@@ -121,7 +121,6 @@
         render(document.querySelector('.tab.active').getAttribute('data-cat'));
       } catch (e) { alert("讀取課表失敗，請稍後再試"); }
     }
-
 function render(category) {
   const container = document.getElementById('course-list');
   container.innerHTML = '';
@@ -188,29 +187,7 @@ function render(category) {
     </div>`;
   });
 }
-
-      filtered.forEach(c => {
-        const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
-        const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
-        const btnId = `btn-${c["課程ID"]}`;
-        let btnHtml = c["isBooked"] 
-          ? `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`
-          : (current >= max ? `<button class="btn-book btn-full">名額已滿</button>` : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`);
-        
-        container.innerHTML += `<div class="card">
-          <div class="course-date">${dateStr} (${c["星期"]})</div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div class="course-title">${c["名稱"]}</div>
-            <div class="teacher-tag">${c["老師"]}</div>
-          </div>
-          <div class="course-detail">⏰ 時段：${c["時段"]}</div>
-          <div class="card-footer">
-            <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
-            ${btnHtml}
-          </div>
-        </div>`;
-      });
-    }
+    
 
     function askAction(id, action, name, date) {
       const modal = document.getElementById('confirmModal');
@@ -289,6 +266,7 @@ async function executeAction(id, action, name, date) {
   </script>
 </body>
 </html>
+
 
 
 
