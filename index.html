@@ -122,15 +122,72 @@
       } catch (e) { alert("讀取課表失敗，請稍後再試"); }
     }
 
-    function render(category) {
-      const container = document.getElementById('course-list');
-      container.innerHTML = '';
-      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+function render(category) {
+  const container = document.getElementById('course-list');
+  container.innerHTML = '';
+  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+  
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
+    return;
+  }
+
+  // --- 獲取現在時間 ---
+  const now = new Date();
+
+  filtered.forEach(c => {
+    const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
+    const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
+    
+    // --- 核心：3 小時限制判斷邏輯 ---
+    let isTimeLocked = false;
+    if (c["日期"] && c["時段"]) {
+      // 支援橫線格式如 "18:20-19:20"
+      const startTimeStr = String(c["時段"]).split(/[-~]/)[0].trim();
+      const [hh, mm] = startTimeStr.split(':');
       
-      if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
-        return;
+      // 組合成課程開始的時間點
+      const classStart = new Date(c["日期"]);
+      classStart.setHours(parseInt(hh), parseInt(mm), 0, 0);
+      
+      // 計算差距：若距離開課小於 3 小時 (10,800,000 毫秒)
+      if (classStart.getTime() - now.getTime() < 3 * 60 * 60 * 1000) {
+        isTimeLocked = true;
       }
+    }
+
+    const btnId = `btn-${c["課程ID"]}`;
+    let btnHtml = "";
+
+    // 優先權 1：檢查時間是否已截止
+    if (isTimeLocked) {
+      btnHtml = `<button class="btn-book btn-full" style="font-size:0.85em;">預約/取消已截止</button>`;
+    } 
+    // 優先權 2：檢查是否已預約
+    else if (c["isBooked"]) {
+      btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`;
+    } 
+    // 優先權 3：檢查名額是否已滿
+    else {
+      btnHtml = (current >= max) 
+        ? `<button class="btn-book btn-full">名額已滿</button>` 
+        : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`;
+    }
+
+    container.innerHTML += `<div class="card">
+      <div class="course-date">${dateStr} (${c["星期"]})</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="course-title">${c["名稱"]}</div>
+        <div class="teacher-tag">${c["老師"]}</div>
+      </div>
+      <div class="course-detail">⏰ 時段：${c["時段"]}</div>
+      <div class="card-footer">
+        <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
+        ${btnHtml}
+      </div>
+    </div>`;
+  });
+}
 
       filtered.forEach(c => {
         const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
@@ -162,36 +219,55 @@
       modal.style.display = 'block';
     }
 
-    async function executeAction(id, action, name, date) {
-      const btn = document.getElementById(`btn-${id}`);
-      btn.disabled = true; btn.classList.add('btn-loading'); btn.innerHTML = `<div class="btn-spinner"></div>`;
-      
-      // 加入輕微震動回饋 (針對 Android 手機)
-      if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
+async function executeAction(id, action, name, date) {
+  const btn = document.getElementById(`btn-${id}`);
+  if (btn) {
+    btn.disabled = true; 
+    btn.innerHTML = `<div class="btn-spinner"></div>`;
+  }
+  
+  if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
 
-      try {
-        const profile = await liff.getProfile();
-        const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) });
-        const result = await response.json();
-        const gasMsg = result.result;
-        const iconBox = document.getElementById('result-icon-box');
-        const titleEl = document.getElementById('result-title');
-        
-        if (gasMsg.includes("成功")) {
-          if (action === 'book') { 
-            iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)"; 
-          } else { 
-            // 更換為掃把圖示 🧹
-            iconBox.innerText = "🧹"; titleEl.innerText = "取消成功!"; titleEl.style.color = "var(--secondary)"; 
-          }
-          document.getElementById('result-content').innerText = date + ' ' + name;
-        } else {
-          iconBox.innerText = "⚠️"; titleEl.innerText = "提醒"; titleEl.style.color = "#E67E22";
-          document.getElementById('result-content').innerText = gasMsg;
-        }
-        document.getElementById('resultModal').style.display = 'block';
-      } catch (err) { location.reload(); }
+  try {
+    const profile = await liff.getProfile();
+    const response = await fetch(GAS_URL, { 
+      method: "POST", 
+      body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) 
+    });
+    
+    const result = await response.json();
+    const gasMsg = result.result; // GAS 回傳的字串
+    const iconBox = document.getElementById('result-icon-box');
+    const titleEl = document.getElementById('result-title');
+    const contentEl = document.getElementById('result-content');
+    
+    // --- 嚴格判斷 GAS 回傳字串 ---
+    if (gasMsg === "預約成功") {
+      iconBox.innerText = "📝"; 
+      titleEl.innerText = "預約成功！"; 
+      titleEl.style.color = "var(--primary)";
+      contentEl.innerText = date + ' ' + name;
+    } 
+    else if (gasMsg === "取消成功") {
+      iconBox.innerText = "🧹"; 
+      titleEl.innerText = "取消成功！"; 
+      titleEl.style.color = "var(--secondary)";
+      contentEl.innerText = date + ' ' + name;
+    } 
+    else {
+      // 處理 "預約失敗"、"取消失敗" 或其他任何系統錯誤
+      iconBox.innerText = "⚠️"; 
+      titleEl.innerText = "提醒"; 
+      titleEl.style.color = "#E67E22";
+      contentEl.innerText = gasMsg; // 直接顯示 GAS 回傳的失敗原因
     }
+
+    document.getElementById('resultModal').style.display = 'block';
+  } catch (err) { 
+    alert("連線異常，頁面將重新載入");
+    location.reload(); 
+  }
+}
 
     async function showUsers(id, name) {
       const list = document.getElementById('modal-text');
@@ -213,5 +289,6 @@
   </script>
 </body>
 </html>
+
 
 
