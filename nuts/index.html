@@ -118,4 +118,93 @@
     <script>
         let products = [];
         let cart = {};
-        const GAS_URL = '
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw5HefjkFm4opf0IiEmCGIgcO_gwuZOaJItKSadarvRNdFCXIQ-v0o0M9j6ztwYK0FwzQ/exec'; 
+        const LIFF_ID = '2009018322-wSwBR4OO';
+
+        async function init() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                const response = await fetch(GAS_URL);
+                products = await response.json();
+                const listEl = document.getElementById('productList');
+                listEl.innerHTML = '';
+                products.forEach(p => {
+                    cart[p.name] = 0;
+                    listEl.innerHTML += `
+                        <div class="item">
+                            <div class="item-info">
+                                <div style="font-weight:500; font-size:1.1rem;">${p.name}</div>
+                                <div style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">$${p.price}</div>
+                            </div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
+                                <span class="qty-num" id="qty-${p.name}">0</span>
+                                <button class="qty-btn" onclick="updateQty('${p.name}', 1)">+</button>
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                document.getElementById('productList').innerText = '載入失敗。';
+            }
+        }
+
+        function updateQty(name, delta) {
+            cart[name] = Math.max(0, cart[name] + delta);
+            document.getElementById(`qty-${name}`).innerText = cart[name];
+            calculate();
+        }
+
+        function calculate() {
+            let total = 0;
+            products.forEach(p => { total += cart[p.name] * p.price; });
+            document.getElementById('totalPrice').innerText = `$ ${total}`;
+            return total;
+        }
+
+        async function sendOrder() {
+            const name = document.getElementById('studentName').value;
+            const total = calculate();
+            if (!name || total === 0) return showModal('提示', '請填寫姓名並選擇產品。');
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; btn.innerText = '傳送中...';
+            let itemsPayload = {};
+            products.forEach(p => { if (cart[p.name] > 0) itemsPayload[p.name] = cart[p.name]; });
+            try {
+                const userId = liff.getContext() ? liff.getContext().userId : "web_user";
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ userName: name, totalPrice: total, userId: userId, items: itemsPayload })
+                });
+                if (liff.isInClient()) {
+                    let orderDetail = products.filter(p => cart[p.name] > 0).map(p => `• ${p.name} x ${cart[p.name]}`).join('\n');
+                    const msg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderDetail}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨通知後至櫃檯繳費。`;
+                    await liff.sendMessages([{ type: 'text', text: msg }]);
+                    showModal('訂購成功', '訂單已送出並傳送到對話視窗！', true);
+                } else {
+                    showModal('訂購成功', '已收到您的預訂。', true);
+                }
+            } catch (e) {
+                showModal('錯誤', '網路傳送失敗');
+                btn.disabled = false; btn.innerText = '確認訂購';
+            }
+        }
+
+        function showModal(title, msg, success = false) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMsg').innerText = msg;
+            const o = document.getElementById('modalOverlay');
+            o.style.display = 'flex';
+            setTimeout(() => o.style.opacity = 1, 10);
+            if(success) window.isPendingReload = true;
+        }
+
+        function closeModal() {
+            const o = document.getElementById('modalOverlay');
+            o.style.opacity = 0;
+            setTimeout(() => { o.style.display = 'none'; if(window.isPendingReload) location.reload(); }, 300);
+        }
+
+        init();
+    </script>
+</body>
+</html>
