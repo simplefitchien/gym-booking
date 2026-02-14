@@ -263,7 +263,7 @@
             }, 300);
         }
 
-        async function sendOrder() {
+async function sendOrder() {
             const name = document.getElementById('studentName').value;
             const total = calculate();
             if (!name) return showModal('提示', '請填寫姓名後再訂購');
@@ -273,13 +273,40 @@
             btn.disabled = true;
             btn.innerText = '傳送中...';
 
+            // 1. 產生訂單明細文字
+            let orderItems = products
+                .filter(p => cart[p.id] > 0)
+                .map(p => `• ${p.name} x ${cart[p.id]}`)
+                .join('\n');
+
+            const lineMsg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderItems}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨通知後至櫃檯繳費。`;
+
             try {
+                // 2. 傳送到 Google 試算表
                 await fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
                 });
-                showModal('訂購成功', '已收到您的預訂，到貨通知繳費。', true);
+
+                // 3. 發送 LINE 訊息 (僅在 LINE App 內有效)
+                if (liff.isInClient()) {
+                    liff.sendMessages([
+                        {
+                            type: 'text',
+                            text: lineMsg
+                        }
+                    ]).then(() => {
+                        showModal('訂購成功', '訂單已傳送到對話視窗！', true);
+                    }).catch((err) => {
+                        console.error('LINE訊息發送失敗', err);
+                        showModal('訂購成功', '訂單已記錄，但無法發送訊息', true);
+                    });
+                } else {
+                    // 若不在 LINE 內開啟（如 Chrome），僅顯示成功彈窗
+                    showModal('訂購成功', '已收到您的預訂，到貨通知繳費。', true);
+                }
+
             } catch (e) {
                 showModal('錯誤', '網路傳送失敗，請稍後再試。');
                 btn.disabled = false;
