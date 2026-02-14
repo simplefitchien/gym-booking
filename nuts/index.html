@@ -4,182 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>極簡運動 - 堅果訂購系統</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         /* --- 莫蘭迪藍配色定義 --- */
         :root { 
-            --primary-color: #6D8299;       /* 主色：莫蘭迪霧霾藍 */
-            --gradient-start: #92A9BD;      /* 漸層起點：淺霧藍 */
-            --gradient-end: #54637A;        /* 漸層終點：深石板藍 */
-            --bg-color: #F4F7F9;            /* 背景：冷調極淺灰 */
-            --text-primary: #3D454D;        /* 主要文字：深碳藍灰 */
-            --text-secondary: #7D8B99;      /* 次要文字：中藍灰 */
-            --border-color: #E1E8ED;        /* 邊框色 */
+            --primary-color: #6D8299; --gradient-start: #92A9BD; --gradient-end: #54637A;
+            --bg-color: #F4F7F9; --text-primary: #3D454D; --text-secondary: #7D8B99; --border-color: #E1E8ED;
         }
-        
-        body { 
-            font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; 
-            background: var(--bg-color); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            color: var(--text-primary);
-        }
-
-        .container { 
-            background: white; 
-            width: 100%; 
-            max-width: 450px; 
-            border-radius: 24px; 
-            box-shadow: 0 15px 35px rgba(109, 130, 153, 0.12); 
-            overflow: hidden; 
-            position: relative;
-        }
-
-        /* 標題區塊 - 莫蘭迪藍漸層 */
-        .header-box {
-            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-
-        .header-box h2 {
-            margin: 0;
-            font-size: 1.6rem;
-            letter-spacing: 3px;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .header-box .subtitle {
-            margin-top: 10px;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.9rem;
-            font-weight: 400;
-            letter-spacing: 1px;
-        }
-
+        body { font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--text-primary); }
+        .container { background: white; width: 100%; max-width: 450px; border-radius: 24px; box-shadow: 0 15px 35px rgba(109, 130, 153, 0.12); overflow: hidden; position: relative; }
+        .header-box { background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); padding: 40px 20px; text-align: center; color: white; }
+        .header-box h2 { margin: 0; font-size: 1.6rem; letter-spacing: 3px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .header-box h2 span { margin-right: 10px; font-size: 1.8rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .content { padding: 24px; }
-
-        .name-section { margin-bottom: 24px; }
-        
-        input[type="text"] { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            font-size: 1rem; 
-            background: #F8FAFB; 
-            transition: 0.3s;
-            color: var(--text-primary);
-        }
-        
-        input[type="text"]:focus { 
-            outline: none; 
-            border-color: var(--primary-color); 
-            background: #fff; 
-        }
-
-        .item-list { margin-bottom: 20px; }
-
-        .item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 18px 0; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        
-        .item-name { font-weight: 500; font-size: 1.1rem; color: var(--text-primary); }
+        input[type="text"] { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 1rem; background: #F8FAFB; margin-bottom: 24px; color: var(--text-primary); transition: 0.3s; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary-color); background: #fff; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--border-color); }
+        .item-info { flex: 1; }
+        .item-name { font-weight: 500; font-size: 1.1rem; }
         .item-price { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
-        
         .qty-control { display: flex; align-items: center; gap: 15px; }
-        .qty-btn { 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
-            background: #fff; 
-            font-size: 1.2rem; 
-            color: var(--primary-color);
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: 0.2s;
-        }
+        .qty-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-color); background: #fff; font-size: 1.2rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .qty-btn:active { background: var(--bg-color); transform: translateY(1px); }
         .qty-num { min-width: 24px; text-align: center; font-weight: 600; font-size: 1.1rem; }
-        
-        .footer { 
-            background: white; 
-            padding-top: 20px; 
-            border-top: 1px solid var(--border-color); 
-            margin-top: 10px; 
-        }
-        
-        .total-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            font-size: 1.2rem; 
-            font-weight: bold; 
-        }
-        
-        .submit-btn { 
-            width: 100%; 
-            padding: 18px; 
-            background: var(--primary-color); 
-            color: white; 
-            border: none; 
-            border-radius: 16px; 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            box-shadow: 0 6px 15px rgba(109, 130, 153, 0.25);
-        }
-        .submit-btn:active { transform: scale(0.98); box-shadow: none; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold; border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 10px; }
+        .submit-btn { width: 100%; padding: 18px; background: var(--primary-color); color: white; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 6px 15px rgba(109, 130, 153, 0.25); transition: 0.3s; }
         .submit-btn:disabled { background: #BDC3C7; box-shadow: none; }
-
-        /* 對話框 */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(61, 69, 77, 0.6); display: none; align-items: center; 
-            justify-content: center; z-index: 1000;
-            backdrop-filter: blur(3px);
-            transition: opacity 0.3s;
-        }
-        .modal { 
-            background: white; padding: 35px; border-radius: 28px; width: 85%; max-width: 320px; 
-            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-        }
-        .modal h3 { margin-top: 0; color: var(--text-primary); font-size: 1.3rem; }
-        .modal p { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin: 18px 0 28px 0; }
-        .modal-btn { 
-            width: 100%; padding: 15px; background: var(--primary-color); 
-            color: white; border: none; border-radius: 14px; font-weight: 600; cursor: pointer;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(61, 69, 77, 0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s; }
+        .modal { background: white; padding: 35px; border-radius: 28px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+        .modal-btn { width: 100%; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 14px; font-weight: 600; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header-box">
-            <h2>🌰堅果團購</h2>
-            <div class="subtitle">第一週登記 · 第二週結單</div>
+            <h2><span>🌰</span>堅果團購</h2>
+            <div style="margin-top:10px; font-size:0.9rem; opacity:0.85; letter-spacing:1px;">第一週登記 · 第二週結單</div>
         </div>
-        
         <div class="content">
-            <div class="name-section">
-                <input type="text" id="studentName" placeholder="請輸入您的姓名">
-            </div>
-
-            <div id="productList" class="item-list"></div>
-
+            <input type="text" id="studentName" placeholder="請輸入您的姓名">
+            <div id="productList">載入產品清單中...</div>
             <div class="footer">
                 <div class="total-row">
                     <span>預估金額</span>
@@ -199,120 +64,122 @@
     </div>
 
     <script>
-        const products = [
-            { id: 'mix', name: '綜合堅果', price: 330 },
-            { id: 'almond', name: '杏仁', price: 250 },
-            { id: 'walnut', name: '核桃', price: 270 },
-            { id: 'pecan', name: '胡桃', price: 400 },
-            { id: 'pumpkin', name: '南瓜子', price: 180 },
-            { id: 'pistachio', name: '開心果', price: 320 },
-            { id: 'macadamia', name: '夏威夷豆', price: 500 },
-            { id: 'cashew', name: '腰果', price: 300 }
-        ];
-
+        let products = [];
         let cart = {};
-        const GAS_URL = '您的_GAS_部署網址'; 
+        
+        // --- 設定區 ---
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw5HefjkFm4opf0IiEmCGIgcO_gwuZOaJItKSadarvRNdFCXIQ-v0o0M9j6ztwYK0FwzQ/exec'; 
+        const LIFF_ID = '2009018322-wSwBR4OO';
 
-        function init() {
-            const listEl = document.getElementById('productList');
-            products.forEach(p => {
-                cart[p.id] = 0;
-                listEl.innerHTML += `
-                    <div class="item">
-                        <div class="item-info">
-                            <div class="item-name">${p.name}</div>
-                            <div class="item-price">$${p.price}</div>
-                        </div>
-                        <div class="qty-control">
-                            <button class="qty-btn" onclick="updateQty('${p.id}', -1)">−</button>
-                            <span class="qty-num" id="qty-${p.id}">0</span>
-                            <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
-                        </div>
-                    </div>`;
-            });
+        async function init() {
+            try {
+                // 初始化 LIFF
+                await liff.init({ liffId: LIFF_ID });
+                
+                // 向 GAS 請求目前的品項 (doGet)
+                const response = await fetch(GAS_URL);
+                products = await response.json();
+                
+                const listEl = document.getElementById('productList');
+                listEl.innerHTML = ''; // 清除讀取中字樣
+                
+                products.forEach(p => {
+                    cart[p.name] = 0;
+                    listEl.innerHTML += `
+                        <div class="item">
+                            <div class="item-info">
+                                <div class="item-name">${p.name}</div>
+                                <div class="item-price">$${p.price}</div>
+                            </div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
+                                <span class="qty-num" id="qty-${p.name}">0</span>
+                                <button class="qty-btn" onclick="updateQty('${p.name}', 1)">+</button>
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                console.error('初始化失敗', err);
+                document.getElementById('productList').innerText = '載入失敗，請確認網路連線。';
+            }
         }
 
-        function updateQty(id, delta) {
-            cart[id] = Math.max(0, cart[id] + delta);
-            document.getElementById(`qty-${id}`).innerText = cart[id];
+        function updateQty(name, delta) {
+            cart[name] = Math.max(0, cart[name] + delta);
+            document.getElementById(`qty-${name}`).innerText = cart[name];
             calculate();
         }
 
         function calculate() {
             let total = 0;
-            products.forEach(p => { total += cart[p.id] * p.price; });
+            products.forEach(p => { total += cart[p.name] * p.price; });
             document.getElementById('totalPrice').innerText = `$ ${total}`;
             return total;
         }
 
-        function showModal(title, msg, isSuccess = false) {
+        async function sendOrder() {
+            const name = document.getElementById('studentName').value;
+            const total = calculate();
+            if (!name || total === 0) return showModal('提示', '請填寫姓名並至少選擇一項產品。');
+
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; btn.innerText = '傳送中...';
+
+            // 整理要傳送給 GAS 的品項物件 { "品名": 數量 }
+            let itemsPayload = {};
+            products.forEach(p => {
+                if (cart[p.name] > 0) itemsPayload[p.name] = cart[p.name];
+            });
+
+            try {
+                const userId = liff.getContext() ? liff.getContext().userId : "web_user";
+                
+                // 1. 傳送到 Google 試算表 (doPost)
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        userName: name, 
+                        totalPrice: total, 
+                        userId: userId,
+                        items: itemsPayload 
+                    })
+                });
+
+                // 2. 如果在 LINE 內，發送數位收據訊息
+                if (liff.isInClient()) {
+                    let orderDetail = products
+                        .filter(p => cart[p.name] > 0)
+                        .map(p => `• ${p.name} x ${cart[p.name]}`)
+                        .join('\n');
+
+                    const msg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderDetail}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨通知後至櫃檯繳費。`;
+                    
+                    await liff.sendMessages([{ type: 'text', text: msg }]);
+                    showModal('訂購成功', '訂單已送出並傳送到對話視窗！', true);
+                } else {
+                    showModal('訂購成功', '已收到您的預訂。', true);
+                }
+            } catch (e) {
+                showModal('錯誤', '網路傳送失敗，請稍後再試。');
+                btn.disabled = false; btn.innerText = '確認訂購';
+            }
+        }
+
+        function showModal(title, msg, success = false) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMsg').innerText = msg;
-            const overlay = document.getElementById('modalOverlay');
-            overlay.style.display = 'flex';
-            setTimeout(() => overlay.style.opacity = 1, 10);
-            if(isSuccess) window.isPendingReload = true;
+            const o = document.getElementById('modalOverlay');
+            o.style.display = 'flex';
+            setTimeout(() => o.style.opacity = 1, 10);
+            if(success) window.isPendingReload = true;
         }
 
         function closeModal() {
-            const overlay = document.getElementById('modalOverlay');
-            overlay.style.opacity = 0;
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                if(window.isPendingReload) location.reload();
-            }, 300);
+            const o = document.getElementById('modalOverlay');
+            o.style.opacity = 0;
+            setTimeout(() => { o.style.display = 'none'; if(window.isPendingReload) location.reload(); }, 300);
         }
 
-async function sendOrder() {
-            const name = document.getElementById('studentName').value;
-            const total = calculate();
-            if (!name) return showModal('提示', '請填寫姓名後再訂購');
-            if (total === 0) return showModal('提示', '請至少選擇一項產品');
-
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerText = '傳送中...';
-
-            // 1. 產生訂單明細文字
-            let orderItems = products
-                .filter(p => cart[p.id] > 0)
-                .map(p => `• ${p.name} x ${cart[p.id]}`)
-                .join('\n');
-
-            const lineMsg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderItems}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨通知後至櫃檯繳費。`;
-
-            try {
-                // 2. 傳送到 Google 試算表
-                await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ userName: name, ...cart, totalPrice: total })
-                });
-
-                // 3. 發送 LINE 訊息 (僅在 LINE App 內有效)
-                if (liff.isInClient()) {
-                    liff.sendMessages([
-                        {
-                            type: 'text',
-                            text: lineMsg
-                        }
-                    ]).then(() => {
-                        showModal('訂購成功', '訂單已傳送到對話視窗！', true);
-                    }).catch((err) => {
-                        console.error('LINE訊息發送失敗', err);
-                        showModal('訂購成功', '訂單已記錄，但無法發送訊息', true);
-                    });
-                } else {
-                    // 若不在 LINE 內開啟（如 Chrome），僅顯示成功彈窗
-                    showModal('訂購成功', '已收到您的預訂，到貨通知繳費。', true);
-                }
-
-            } catch (e) {
-                showModal('錯誤', '網路傳送失敗，請稍後再試。');
-                btn.disabled = false;
-                btn.innerText = '確認訂購';
-            }
-        }
         init();
     </script>
 </body>
