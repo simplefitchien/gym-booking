@@ -7,71 +7,97 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root { 
-            --primary-color: #6D8299; --gradient-start: #92A9BD; --gradient-end: #54637A;
-            --bg-color: #F4F7F9; --text-primary: #3D454D; --text-secondary: #7D8B99; --border-color: #E1E8ED;
+            --primary-color: #8CB369; /* 同步運動館綠色 */
+            --gradient-start: #92A9BD; --gradient-end: #54637A;
+            --bg-color: #F8FAF8;      /* 暖調背景 */
+            --text-primary: #344E41;  /* 森林深灰綠 */
+            --text-secondary: #84A59D; --border-color: #E1E8ED;
         }
         body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 15px; display: flex; justify-content: center; color: var(--text-primary); }
         
         /* 容器結構優化 */
-        .container { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(109, 130, 153, 0.1); overflow: hidden; position: relative; }
+        .container { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(52, 78, 65, 0.08); overflow: hidden; position: relative; }
         
-        /* --- Header 調整：高度壓縮、下排直角 --- */
+        /* --- Header：精簡高度、左右圖示、下排直角 --- */
         .header-box { 
             background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); 
-            padding: 20px 15px; /* 高度縮減 1/2 */
+            padding: 18px 20px; 
             text-align: center; 
             color: white; 
-            border-radius: 25px 25px 0 0; /* 下方直角銜接 */
+            border-radius: 25px 25px 0 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+        .header-icon { font-size: 1.5rem; display: inline-block; }
+        /* 松鼠微跳動動畫 */
+        .squirrel-anim { animation: squirrel-jump 2.5s infinite ease-in-out; }
+        
         .header-box h2 { 
             margin: 0; 
-            font-size: 1.4rem; /* 略微縮小字體配合高度 */
+            font-size: 1.4rem; 
             letter-spacing: 2px; 
-            font-weight: 700; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            font-weight: 800; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .header-box h2 span { margin-right: 8px; font-size: 1.6rem; }
         
         .sub-header-info {
-            margin-top: 5px; 
             font-size: 0.85rem; 
-            opacity: 0.9; 
+            opacity: 0.95; 
             letter-spacing: 1px;
             font-weight: 500;
+            margin-top: 2px;
         }
 
         .content { padding: 20px; }
         
         /* 輸入框與項目優化 */
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; background: #F8FAFB; margin-bottom: 20px; color: var(--text-primary); transition: 0.3s; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; background: #F9FBF9; margin-bottom: 20px; color: var(--text-primary); transition: 0.3s; }
         input[type="text"]:focus { outline: none; border-color: var(--primary-color); background: #fff; }
         
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F4F7; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F4F0; }
         .qty-control { display: flex; align-items: center; gap: 12px; }
         .qty-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff; font-size: 1.1rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .qty-num { min-width: 20px; text-align: center; font-weight: 600; font-size: 1rem; }
+        .qty-num { min-width: 20px; text-align: center; font-weight: 700; font-size: 1rem; color: var(--text-primary); }
         
         /* 底部按鈕減壓 */
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.1rem; font-weight: bold; border-top: 1px solid #F0F4F7; padding-top: 15px; margin-top: 10px; }
-        .submit-btn { width: 100%; padding: 16px; background: var(--primary-color); color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(109, 130, 153, 0.2); transition: 0.3s; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.1rem; font-weight: 900; border-top: 1px solid #F0F4F0; padding-top: 15px; margin-top: 10px; }
+        .submit-btn { width: 100%; padding: 16px; background: var(--primary-color); color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(140, 179, 105, 0.25); transition: 0.3s; }
+        .submit-btn:disabled { background: #BDC3C7; box-shadow: none; }
         
-        /* 彈窗優化 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(61, 69, 77, 0.4); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal { background: white; padding: 30px; border-radius: 25px; width: 80%; max-width: 300px; text-align: center; }
-        .modal-btn { width: 60%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 20px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        /* Loading 與 彈窗 */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes squirrel-jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px) rotate(-5deg); } }
+        .btn-spinner { width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.05); border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(52, 78, 65, 0.25); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal { background: white; padding: 30px; border-radius: 25px; width: 80%; max-width: 300px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .modal-btn { width: 60%; padding: 10px; background: var(--primary-color); color: white; border: none; border-radius: 20px; font-weight: 600; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header-box">
-            <h2><span>🌰</span>堅果團購</h2>
+            <div class="header-title-container">
+                <span class="header-icon squirrel-anim">🐿️</span>
+                <h2>堅果團購</h2>
+                <span class="header-icon">🌰</span>
+            </div>
             <div class="sub-header-info">每月一號登記、五號結單</div>
         </div>
         <div class="content">
             <input type="text" id="studentName" placeholder="請輸入您的姓名">
-            <div id="productList">載入產品清單中...</div>
+            
+            <div id="productList" style="text-align:center; padding:50px 0;">
+                <div class="btn-spinner"></div>
+                <div style="margin-top:10px; font-size:0.9rem; color:var(--text-secondary); letter-spacing:1px;">同步產品清單中...</div>
+            </div>
+
             <div class="footer">
                 <div class="total-row">
                     <span>預估金額</span>
@@ -84,8 +110,8 @@
 
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal">
-            <h3 id="modalTitle" style="margin-top:0;">通知</h3>
-            <p id="modalMsg" style="color:var(--text-secondary); line-height:1.6;"></p>
+            <h3 id="modalTitle" style="margin-top:0; color:var(--text-primary); font-weight:900;">通知</h3>
+            <p id="modalMsg" style="color:var(--text-secondary); line-height:1.6; font-size: 0.95rem;"></p>
             <button class="modal-btn" onclick="closeModal()">確定</button>
         </div>
     </div>
@@ -93,29 +119,23 @@
     <script>
         let products = [];
         let cart = {};
-        
-        // --- 設定區 ---
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbw5HefjkFm4opf0IiEmCGIgcO_gwuZOaJItKSadarvRNdFCXIQ-v0o0M9j6ztwYK0FwzQ/exec'; 
         const LIFF_ID = '2009018322-wSwBR4OO';
 
         async function init() {
             try {
                 await liff.init({ liffId: LIFF_ID });
-                
-                // 取得產品清單
                 const response = await fetch(GAS_URL);
                 products = await response.json();
-                
                 const listEl = document.getElementById('productList');
                 listEl.innerHTML = '';
-                
                 products.forEach(p => {
                     cart[p.name] = 0;
                     listEl.innerHTML += `
                         <div class="item">
                             <div>
-                                <div style="font-weight:500; font-size:1.1rem;">${p.name}</div>
-                                <div style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">$${p.price}</div>
+                                <div style="font-weight:600; font-size:1.05rem;">${p.name}</div>
+                                <div style="color:var(--text-secondary); font-size:0.85rem; margin-top:4px;">$${p.price}</div>
                             </div>
                             <div class="qty-control">
                                 <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
@@ -125,8 +145,7 @@
                         </div>`;
                 });
             } catch (err) {
-                console.error('初始化失敗', err);
-                document.getElementById('productList').innerText = '載入失敗，請確認網路連線。';
+                document.getElementById('productList').innerHTML = '<div style="color:#E74C3C;">載入失敗，請稍後再試。</div>';
             }
         }
 
@@ -146,47 +165,27 @@
         async function sendOrder() {
             const name = document.getElementById('studentName').value;
             const total = calculate();
-            if (!name || total === 0) return showModal('提示', '請填寫姓名並至少選擇一項產品。');
-
+            if (!name || total === 0) return showModal('提示', '請填寫姓名並選擇產品。');
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerText = '傳送中...';
-
-            // 整理品項資料：{ "品名": 數量 }
+            btn.disabled = true; btn.innerHTML = '<div class="btn-spinner" style="border-top-color:#fff; width:14px; height:14px;"></div> 傳送中...';
             let itemsPayload = {};
-            products.forEach(p => {
-                if (cart[p.name] > 0) itemsPayload[p.name] = cart[p.name];
-            });
-
+            products.forEach(p => { if (cart[p.name] > 0) itemsPayload[p.name] = cart[p.name]; });
             try {
                 const userId = liff.getContext() ? liff.getContext().userId : "web_user";
-                
-                // 傳送到 GAS
                 await fetch(GAS_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ 
-                        userName: name, 
-                        totalPrice: total, 
-                        userId: userId,
-                        items: itemsPayload 
-                    })
+                    body: JSON.stringify({ userName: name, totalPrice: total, userId: userId, items: itemsPayload })
                 });
-
-                // 發送 LINE 收據訊息
                 if (liff.isInClient()) {
-                    let orderDetail = products
-                        .filter(p => cart[p.name] > 0)
-                        .map(p => `• ${p.name} x ${cart[p.name]}`)
-                        .join('\n');
-
-                    const msg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderDetail}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨通知後至櫃檯繳費。`;
-                    
+                    let orderDetail = products.filter(p => cart[p.name] > 0).map(p => `• ${p.name} x ${cart[p.name]}`).join('\n');
+                    const msg = `✅ 堅果訂購成功！\n\n[訂單明細]\n${orderDetail}\n----------------\n💰 預計總額：$${total}\n👤 訂購人：${name}\n\n※ 請於到貨後至櫃檯繳費。`;
                     await liff.sendMessages([{ type: 'text', text: msg }]);
                     showModal('訂購成功', '訂單已送出並傳送到對話視窗！', true);
                 } else {
                     showModal('訂購成功', '已收到您的預訂。', true);
                 }
             } catch (e) {
-                showModal('錯誤', '網路傳送失敗，請稍後再試。');
+                showModal('錯誤', '網路傳送失敗');
                 btn.disabled = false; btn.innerText = '確認訂購';
             }
         }
