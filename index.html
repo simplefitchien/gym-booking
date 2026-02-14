@@ -18,11 +18,40 @@
     }
     body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
     
-    .header { background: white; padding: 25px 20px; text-align: left; border-bottom: 1px solid #EAECEF; }
-    .header-title { font-size: 24px; font-weight: 800; letter-spacing: 1px; margin: 0; color: #333; }
-    .user-welcome { font-size: 14px; color: #888; margin-top: 5px; }
+    /* --- Header 調整：置中風格並加入左右圖示 --- */
+    .header { 
+      background: var(--secondary); 
+      margin: 15px; 
+      padding: 40px 20px; 
+      text-align: center;         
+      border-radius: 30px;        
+      box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
+    }
+    .header-title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .header-icon { 
+      font-size: 32px; 
+    }
+    .header-title { 
+      font-size: 26px; 
+      font-weight: 800; 
+      letter-spacing: 2px; 
+      margin: 0; 
+      color: #FFFFFF;             
+    }
+    .user-welcome { 
+      font-size: 14px; 
+      color: rgba(255, 255, 255, 0.8); 
+      margin-top: 5px; 
+      font-weight: 500;
+    }
 
-    /* 選單精簡為"肌力"、"有氧" */
+    /* 選單樣式 */
     .nav-tabs { 
       display: flex; margin: 20px; background: #E0E6ED; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
@@ -34,7 +63,7 @@
       background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 179, 71, 0.4);
     }
 
-    /* 課程卡片 */
+    /* 課程卡片樣式 */
     #course-list { padding: 0 20px 80px 20px; }
     .card { 
       background: var(--card-bg); border-radius: 25px; padding: 24px; margin-bottom: 20px; 
@@ -42,19 +71,14 @@
     }
     .course-date { font-size: 0.95em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
     .course-title { font-size: 1.4em; font-weight: 900; color: #333; margin: 5px 0; }
-    
-    /* 老師字體加大 */
     .teacher-tag { 
       font-size: 1em; background: #F4F7F9; color: var(--secondary); padding: 6px 14px; border-radius: 10px; font-weight: 700;
     }
-    
-    /* 時段鬧鐘圖示 */
     .course-detail { font-size: 0.95em; color: #7F8C8D; margin-top: 10px; font-weight: 500; }
-    
     .card-footer { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #F2F4F7; }
     .capacity-link { color: #5DADE2; text-decoration: none; cursor: pointer; font-weight: 800; font-size: 0.95em; }
 
-    /* 按鈕固定大小 110x40 */
+    /* 按鈕樣式 */
     .btn-book { 
       width: 110px; height: 42px; border-radius: 15px; border: none; font-weight: 800; font-size: 0.95em; 
       cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
@@ -62,14 +86,12 @@
     .btn-active { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 179, 71, 0.3); }
     .btn-delete { background: var(--secondary); color: white; box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2); }
     .btn-full { background: #BDC3C7; color: white; cursor: not-allowed; }
-    
     .btn-spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.3); border-top: 2.5px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
 
-    /* 彈窗設計 */
+    /* 彈窗樣式 */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.4); backdrop-filter: blur(8px); }
     .modal-content { background: #fff; margin: 30% auto; padding: 35px; border-radius: 35px; width: 80%; max-width: 320px; text-align: center; }
     .modal-list { text-align: left; margin: 20px 0; max-height: 200px; overflow-y: auto; line-height: 2.5; border-top: 1px solid #F2F4F7; padding-top: 15px; font-size: 15px; }
-    
     .btn-modal-cancel { flex: 1; padding: 12px; border-radius: 18px; border: 1.5px solid #EAECEF; background: #fff; color: #95A5A6; cursor: pointer; font-weight: bold; }
     .btn-modal-confirm { flex: 1; padding: 12px; border-radius: 18px; border: none; background: var(--primary); color: #fff; cursor: pointer; font-weight: bold; }
     
@@ -80,7 +102,11 @@
 <body>
 
   <div class="header">
-    <h1 class="header-title">探索運動</h1>
+    <div class="header-title-container">
+      <span class="header-icon">🧘</span>
+      <h1 class="header-title">探索運動</h1>
+      <span class="header-icon">🏋️</span>
+    </div>
     <div id="status" class="user-welcome">正在取得資料...</div>
   </div>
   
@@ -94,9 +120,7 @@
   </div>
 
   <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:900;">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" style="width:100%; border-radius:18px;" onclick="closeModal('userModal')">關閉</button></div></div>
-
   <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:#BDC3C7; font-weight:700;">CONFIRM</h3><p id="confirm-msg" style="font-size: 1.3em; font-weight: 900; color: var(--secondary);"></p><div style="display:flex; gap:12px; margin-top:25px;"><button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
-
   <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" class="result-icon"></span><h3 id="result-title" style="margin:0; font-weight:900;"></h3><div id="result-content" style="font-size: 1.2em; font-weight: 900; margin: 15px 0; color: var(--secondary);"></div><button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button></div></div>
 
   <script>
@@ -121,73 +145,61 @@
         render(document.querySelector('.tab.active').getAttribute('data-cat'));
       } catch (e) { alert("讀取課表失敗，請稍後再試"); }
     }
-function render(category) {
-  const container = document.getElementById('course-list');
-  container.innerHTML = '';
-  const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
-  
-  if (filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
-    return;
-  }
 
-  // --- 獲取現在時間 ---
-  const now = new Date();
-
-  filtered.forEach(c => {
-    const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
-    const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
-    
-    // --- 核心：3 小時限制判斷邏輯 ---
-    let isTimeLocked = false;
-    if (c["日期"] && c["時段"]) {
-      // 支援橫線格式如 "18:20-19:20"
-      const startTimeStr = String(c["時段"]).split(/[-~]/)[0].trim();
-      const [hh, mm] = startTimeStr.split(':');
+    function render(category) {
+      const container = document.getElementById('course-list');
+      container.innerHTML = '';
+      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
       
-      // 組合成課程開始的時間點
-      const classStart = new Date(c["日期"]);
-      classStart.setHours(parseInt(hh), parseInt(mm), 0, 0);
-      
-      // 計算差距：若距離開課小於 3 小時 (10,800,000 毫秒)
-      if (classStart.getTime() - now.getTime() < 3 * 60 * 60 * 1000) {
-        isTimeLocked = true;
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
+        return;
       }
+
+      const now = new Date();
+
+      filtered.forEach(c => {
+        const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
+        const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
+        
+        let isTimeLocked = false;
+        if (c["日期"] && c["時段"]) {
+          const startTimeStr = String(c["時段"]).split(/[-~]/)[0].trim();
+          const [hh, mm] = startTimeStr.split(':');
+          const classStart = new Date(c["日期"]);
+          classStart.setHours(parseInt(hh), parseInt(mm), 0, 0);
+          if (classStart.getTime() - now.getTime() < 3 * 60 * 60 * 1000) {
+            isTimeLocked = true;
+          }
+        }
+
+        const btnId = `btn-${c["課程ID"]}`;
+        let btnHtml = "";
+
+        if (isTimeLocked) {
+          btnHtml = `<button class="btn-book btn-full" style="font-size:0.85em;">已截止</button>`;
+        } else if (c["isBooked"]) {
+          btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`;
+        } else {
+          btnHtml = (current >= max) 
+            ? `<button class="btn-book btn-full">名額已滿</button>` 
+            : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`;
+        }
+
+        container.innerHTML += `<div class="card">
+          <div class="course-date">${dateStr} (${c["星期"]})</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="course-title">${c["名稱"]}</div>
+            <div class="teacher-tag">${c["老師"]}</div>
+          </div>
+          <div class="course-detail">⏰ 時段：${c["時段"]}</div>
+          <div class="card-footer">
+            <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
+            ${btnHtml}
+          </div>
+        </div>`;
+      });
     }
-
-    const btnId = `btn-${c["課程ID"]}`;
-    let btnHtml = "";
-
-    // 優先權 1：檢查時間是否已截止
-    if (isTimeLocked) {
-      btnHtml = `<button class="btn-book btn-full" style="font-size:0.85em;">預約/取消已截止</button>`;
-    } 
-    // 優先權 2：檢查是否已預約
-    else if (c["isBooked"]) {
-      btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`;
-    } 
-    // 優先權 3：檢查名額是否已滿
-    else {
-      btnHtml = (current >= max) 
-        ? `<button class="btn-book btn-full">名額已滿</button>` 
-        : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`;
-    }
-
-    container.innerHTML += `<div class="card">
-      <div class="course-date">${dateStr} (${c["星期"]})</div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="course-title">${c["名稱"]}</div>
-        <div class="teacher-tag">${c["老師"]}</div>
-      </div>
-      <div class="course-detail">⏰ 時段：${c["時段"]}</div>
-      <div class="card-footer">
-        <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
-        ${btnHtml}
-      </div>
-    </div>`;
-  });
-}
-    
 
     function askAction(id, action, name, date) {
       const modal = document.getElementById('confirmModal');
@@ -196,55 +208,36 @@ function render(category) {
       modal.style.display = 'block';
     }
 
-async function executeAction(id, action, name, date) {
-  const btn = document.getElementById(`btn-${id}`);
-  if (btn) {
-    btn.disabled = true; 
-    btn.innerHTML = `<div class="btn-spinner"></div>`;
-  }
-  
-  if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
+    async function executeAction(id, action, name, date) {
+      const btn = document.getElementById(`btn-${id}`);
+      if (btn) { btn.disabled = true; btn.innerHTML = `<div class="btn-spinner"></div>`; }
+      if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
 
-  try {
-    const profile = await liff.getProfile();
-    const response = await fetch(GAS_URL, { 
-      method: "POST", 
-      body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) 
-    });
-    
-    const result = await response.json();
-    const gasMsg = result.result; // GAS 回傳的字串
-    const iconBox = document.getElementById('result-icon-box');
-    const titleEl = document.getElementById('result-title');
-    const contentEl = document.getElementById('result-content');
-    
-    // --- 嚴格判斷 GAS 回傳字串 ---
-    if (gasMsg === "預約成功") {
-      iconBox.innerText = "📝"; 
-      titleEl.innerText = "預約成功！"; 
-      titleEl.style.color = "var(--primary)";
-      contentEl.innerText = date + ' ' + name;
-    } 
-    else if (gasMsg === "取消成功") {
-      iconBox.innerText = "🧹"; 
-      titleEl.innerText = "取消成功！"; 
-      titleEl.style.color = "var(--secondary)";
-      contentEl.innerText = date + ' ' + name;
-    } 
-    else {
-      // 處理 "預約失敗"、"取消失敗" 或其他任何系統錯誤
-      iconBox.innerText = "⚠️"; 
-      titleEl.innerText = "提醒"; 
-      titleEl.style.color = "#E67E22";
-      contentEl.innerText = gasMsg; // 直接顯示 GAS 回傳的失敗原因
+      try {
+        const profile = await liff.getProfile();
+        const response = await fetch(GAS_URL, { 
+          method: "POST", 
+          body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) 
+        });
+        const result = await response.json();
+        const gasMsg = result.result;
+        const iconBox = document.getElementById('result-icon-box');
+        const titleEl = document.getElementById('result-title');
+        const contentEl = document.getElementById('result-content');
+        
+        if (gasMsg === "預約成功") {
+          iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)";
+          contentEl.innerText = date + ' ' + name;
+        } else if (gasMsg === "取消成功") {
+          iconBox.innerText = "🧹"; titleEl.innerText = "取消成功！"; titleEl.style.color = "var(--secondary)";
+          contentEl.innerText = date + ' ' + name;
+        } else {
+          iconBox.innerText = "⚠️"; titleEl.innerText = "提醒"; titleEl.style.color = "#E67E22";
+          contentEl.innerText = gasMsg;
+        }
+        document.getElementById('resultModal').style.display = 'block';
+      } catch (err) { alert("連線異常，頁面將重新載入"); location.reload(); }
     }
-
-    document.getElementById('resultModal').style.display = 'block';
-  } catch (err) { 
-    alert("連線異常，頁面將重新載入");
-    location.reload(); 
-  }
-}
 
     async function showUsers(id, name) {
       const list = document.getElementById('modal-text');
@@ -266,7 +259,3 @@ async function executeAction(id, action, name, date) {
   </script>
 </body>
 </html>
-
-
-
-
