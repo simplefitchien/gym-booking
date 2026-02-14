@@ -14,7 +14,6 @@
         
         .container { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(109, 130, 153, 0.1); overflow: hidden; position: relative; }
         
-        /* --- Header：精簡高度、下排直角、小圖示 --- */
         .header-box { 
             background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); 
             padding: 18px 20px; 
@@ -33,34 +32,35 @@
         .header-icon { font-size: 1.5rem; display: inline-block; }
         .squirrel-anim { animation: squirrel-jump 2.5s infinite ease-in-out; }
         
-        .header-box h2 { 
-            margin: 0; 
-            font-size: 1.4rem; 
-            letter-spacing: 2px; 
-            font-weight: 700; 
-        }
-        
-        .sub-header-info {
-            font-size: 0.85rem; 
-            opacity: 0.9; 
-            letter-spacing: 1px;
-            font-weight: 500;
-            margin-top: 2px;
-        }
+        .header-box h2 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; font-weight: 700; }
+        .sub-header-info { font-size: 0.85rem; opacity: 0.9; letter-spacing: 1px; font-weight: 500; margin-top: 2px; }
 
         .content { padding: 20px; }
         
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; background: #F8FAFB; margin-bottom: 20px; color: var(--text-primary); transition: 0.3s; }
+        /* --- 修正：縮減姓名欄位的下邊距 --- */
+        input[type="text"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 0.95rem; 
+            background: #F8FAFB; 
+            margin-bottom: 10px; /* 從 20px 縮減為 10px */
+            color: var(--text-primary); 
+            transition: 0.3s; 
+        }
         input[type="text"]:focus { outline: none; border-color: var(--primary-color); background: #fff; }
         
-        /* --- 列表對齊修正：確保價格不偏位 --- */
         .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F4F7; }
+        /* 移除最後一個項目的底線，讓底部更乾淨 */
+        .item:last-child { border-bottom: none; }
         
         .item-info { 
-            flex: 1;               /* 填滿左側空間 */
+            flex: 1; 
             display: flex; 
             flex-direction: column; 
-            align-items: flex-start; /* 確保所有文字左對齊 */
+            align-items: flex-start; 
         }
         
         .qty-control { display: flex; align-items: center; gap: 12px; }
@@ -92,8 +92,7 @@
         <div class="content">
             <input type="text" id="studentName" placeholder="請輸入您的姓名">
             
-            <div id="productList" style="text-align:center; padding:50px 0;">
-                <div class="btn-spinner"></div>
+            <div id="productList" style="text-align:center; padding:20px 0;"> <div class="btn-spinner"></div>
                 <div style="margin-top:10px; font-size:0.9rem; color:var(--text-secondary);">同步產品清單中...</div>
             </div>
 
