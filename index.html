@@ -1,101 +1,262 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>奶茶色簡約選單</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            /* 奶茶色系定義 */
-            --milk-tea-bg: #E7D7C1;       /* 主背景：奶茶色 */
-            --milk-tea-border: #D7C4A9;   /* 分隔線色 */
-            --milk-tea-text: #5D4037;     /* 文字與圖示：深焙色 */
-            --milk-tea-active: #FFFFFF;   /* 選中狀態：白色背景 */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極簡運動 - 課程預約系統</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root { 
+      --primary: #FFB347;      /* 陽光亮橘 */
+      --primary-dark: #F39C12; 
+      --secondary: #E7D7C1;    /* 奶茶色  */
+      --text-dark: #5D4037;     /* 深焙棕色 (用於奶茶色背景上的文字) */
+      --bg: #F0F4F8;           /* 清透天空灰白 */
+      --text: #2C3E50; 
+      --danger: #E74C3C; 
+      --card-bg: #FFFFFF;
+      --tag-bg: #5DADE2;       /* 晴空藍 */
+    }
+    body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    
+    /* --- Header 調整：更換為奶茶色並減少 1/4 高度 --- */
+    .header { 
+      background: var(--secondary); 
+      margin: 15px; 
+      padding: 30px 20px;       /* 高度減少 1/4 (原為 40px) */
+      text-align: center;         
+      border-radius: 30px;        
+      box-shadow: 0 10px 20px rgba(93, 64, 55, 0.1); /* 陰影調整為深棕色調 */
+    }
+    .header-title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .header-icon { 
+      font-size: 32px; 
+    }
+    .header-title { 
+      font-size: 26px; 
+      font-weight: 800; 
+      letter-spacing: 2px; 
+      margin: 0; 
+      color: var(--text-dark); /* 標題改為深焙色以配合奶茶底 */
+    }
+    .user-welcome { 
+      font-size: 14px; 
+      color: rgba(93, 64, 55, 0.7); /* 歡迎文字也改為深色調 */
+      margin-top: 5px; 
+      font-weight: 500;
+    }
 
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
+    /* 選單樣式 */
+    .nav-tabs { 
+      display: flex; margin: 20px; background: #E0E6ED; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .tab { 
+      flex: 1; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 40px; 
+      font-weight: 700; font-size: 16px; color: #7F8C8D; cursor: pointer; transition: 0.3s;
+    }
+    .tab.active { 
+      background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 179, 71, 0.4);
+    }
 
-        /* 導覽列主體 */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 65px; /* 減少高度後的尺寸 */
-            background-color: var(--milk-tea-bg);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-            border-top: 1px solid var(--milk-tea-border);
-            z-index: 1000;
-        }
+    /* 課程卡片樣式 */
+    #course-list { padding: 0 20px 80px 20px; }
+    .card { 
+      background: var(--card-bg); border-radius: 25px; padding: 24px; margin-bottom: 20px; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8);
+    }
+    .course-date { font-size: 0.95em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
+    .course-title { font-size: 1.4em; font-weight: 900; color: #333; margin: 5px 0; }
+    .teacher-tag { 
+      font-size: 1em; background: #F4F7F9; color: var(--text-dark); padding: 6px 14px; border-radius: 10px; font-weight: 700;
+    }
+    .course-detail { font-size: 0.95em; color: #7F8C8D; margin-top: 10px; font-weight: 500; }
+    .card-footer { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #F2F4F7; }
+    .capacity-link { color: #5DADE2; text-decoration: none; cursor: pointer; font-weight: 800; font-size: 0.95em; }
 
-        /* 選單項目 */
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--milk-tea-text);
-            transition: all 0.3s ease;
-            height: 100%;
-            border-right: 1px solid var(--milk-tea-border); /* 模擬圖片中的分割線 */
-        }
+    /* 按鈕樣式 */
+    .btn-book { 
+      width: 110px; height: 42px; border-radius: 15px; border: none; font-weight: 800; font-size: 0.95em; 
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .btn-active { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 179, 71, 0.3); }
+    .btn-delete { background: #5D4037; color: white; box-shadow: 0 5px 15px rgba(93, 64, 55, 0.2); }
+    .btn-full { background: #BDC3C7; color: white; cursor: not-allowed; }
+    .btn-spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.3); border-top: 2.5px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
 
-        .nav-item:last-child {
-            border-right: none;
-        }
-
-        /* 圖示樣式 */
-        .nav-item i {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-        }
-
-        /* 文字樣式 */
-        .nav-item span {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        /* 點擊或選中效果 */
-        .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-item:active {
-            background-color: var(--milk-tea-border);
-        }
-    </style>
+    /* 彈窗樣式 */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.4); backdrop-filter: blur(8px); }
+    .modal-content { background: #fff; margin: 30% auto; padding: 35px; border-radius: 35px; width: 80%; max-width: 320px; text-align: center; }
+    .modal-list { text-align: left; margin: 20px 0; max-height: 200px; overflow-y: auto; line-height: 2.5; border-top: 1px solid #F2F4F7; padding-top: 15px; font-size: 15px; }
+    .btn-modal-cancel { flex: 1; padding: 12px; border-radius: 18px; border: 1.5px solid #EAECEF; background: #fff; color: #95A5A6; cursor: pointer; font-weight: bold; }
+    .btn-modal-confirm { flex: 1; padding: 12px; border-radius: 18px; border: none; background: var(--primary); color: #fff; cursor: pointer; font-weight: bold; }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .result-icon { font-size: 70px; margin-bottom: 15px; display: block; }
+  </style>
 </head>
 <body>
 
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-house"></i>
-            <span>首頁</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-calendar-days"></i>
-            <span>課程</span>
-        </a>
-        <a href="#" class="nav-item active">
-            <i class="fa-solid fa-dumbbell"></i>
-            <span>運動</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>我的</span>
-        </a>
-    </nav>
+  <div class="header">
+    <div class="header-title-container">
+      <span class="header-icon">🧘</span>
+      <h1 class="header-title">探索運動</h1>
+      <span class="header-icon">🏋️</span>
+    </div>
+    <div id="status" class="user-welcome">正在取得資料...</div>
+  </div>
+  
+  <div class="nav-tabs">
+    <div class="tab active" data-cat="肌力" onclick="changeTab(this)">肌力</div>
+    <div class="tab" data-cat="有氧" onclick="changeTab(this)">有氧</div>
+  </div>
 
+  <div id="course-list">
+    <div style="text-align:center; padding:100px; color:#BDC3C7;"><div class="btn-spinner" style="border-top-color:var(--primary); margin:0 auto 10px;"></div>同步中...</div>
+  </div>
+
+  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:900;">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" style="width:100%; border-radius:18px;" onclick="closeModal('userModal')">關閉</button></div></div>
+  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:#BDC3C7; font-weight:700;">CONFIRM</h3><p id="confirm-msg" style="font-size: 1.3em; font-weight: 900; color: var(--text-dark);"></p><div style="display:flex; gap:12px; margin-top:25px;"><button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
+  <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" class="result-icon"></span><h3 id="result-title" style="margin:0; font-weight:900;"></h3><div id="result-content" style="font-size: 1.2em; font-weight: 900; margin: 15px 0; color: var(--text-dark);"></div><button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button></div></div>
+
+  <script>
+    const LIFF_ID = "2009018322-JGFORbhc"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
+    let allCourses = [];
+
+    window.onload = async function() {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) { liff.login(); }
+      else { 
+        const profile = await liff.getProfile();
+        document.getElementById('status').innerText = `您好，${profile.displayName}！準備好今天的訓練了嗎？`;
+        fetchData(profile.userId); 
+      }
+    };
+
+    async function fetchData(userId) {
+      try {
+        const response = await fetch(`${GAS_URL}?userId=${userId}`);
+        allCourses = await response.json();
+        render(document.querySelector('.tab.active').getAttribute('data-cat'));
+      } catch (e) { alert("讀取課表失敗，請稍後再試"); }
+    }
+
+    function render(category) {
+      const container = document.getElementById('course-list');
+      container.innerHTML = '';
+      const filtered = allCourses.filter(c => String(c["分類"]).trim() === String(category).trim());
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:100px; color:#BDC3C7;">目前沒有相關課程</div>`;
+        return;
+      }
+
+      const now = new Date();
+
+      filtered.forEach(c => {
+        const current = parseInt(c["目前人數"]) || 0, max = parseInt(c["上限"]) || 0;
+        const dateStr = c["日期"] ? String(c["日期"]).split('T')[0] : "日期未定";
+        
+        let isTimeLocked = false;
+        if (c["日期"] && c["時段"]) {
+          const startTimeStr = String(c["時段"]).split(/[-~]/)[0].trim();
+          const [hh, mm] = startTimeStr.split(':');
+          const classStart = new Date(c["日期"]);
+          classStart.setHours(parseInt(hh), parseInt(mm), 0, 0);
+          if (classStart.getTime() - now.getTime() < 3 * 60 * 60 * 1000) {
+            isTimeLocked = true;
+          }
+        }
+
+        const btnId = `btn-${c["課程ID"]}`;
+        let btnHtml = "";
+
+        if (isTimeLocked) {
+          btnHtml = `<button class="btn-book btn-full" style="font-size:0.85em;">已截止</button>`;
+        } else if (c["isBooked"]) {
+          btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`;
+        } else {
+          btnHtml = (current >= max) 
+            ? `<button class="btn-book btn-full">名額已滿</button>` 
+            : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`;
+        }
+
+        container.innerHTML += `<div class="card">
+          <div class="course-date">${dateStr} (${c["星期"]})</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="course-title">${c["名稱"]}</div>
+            <div class="teacher-tag">${c["老師"]}</div>
+          </div>
+          <div class="course-detail">⏰ 時段：${c["時段"]}</div>
+          <div class="card-footer">
+            <div class="capacity-link" onclick="showUsers('${c["課程ID"]}', '${c["名稱"]}')">已預約 ${current} / ${max}</div>
+            ${btnHtml}
+          </div>
+        </div>`;
+      });
+    }
+
+    function askAction(id, action, name, date) {
+      const modal = document.getElementById('confirmModal');
+      document.getElementById('confirm-msg').innerText = (action === 'delete' ? '取消 ' : '預約 ') + date + ' ' + name;
+      document.getElementById('btn-do-action').onclick = function() { closeModal('confirmModal'); executeAction(id, action, name, date); };
+      modal.style.display = 'block';
+    }
+
+    async function executeAction(id, action, name, date) {
+      const btn = document.getElementById(`btn-${id}`);
+      if (btn) { btn.disabled = true; btn.innerHTML = `<div class="btn-spinner"></div>`; }
+      if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(20); }
+
+      try {
+        const profile = await liff.getProfile();
+        const response = await fetch(GAS_URL, { 
+          method: "POST", 
+          body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) 
+        });
+        const result = await response.json();
+        const gasMsg = result.result;
+        const iconBox = document.getElementById('result-icon-box');
+        const titleEl = document.getElementById('result-title');
+        const contentEl = document.getElementById('result-content');
+        
+        if (gasMsg === "預約成功") {
+          iconBox.innerText = "📝"; titleEl.innerText = "預約成功！"; titleEl.style.color = "var(--primary)";
+          contentEl.innerText = date + ' ' + name;
+        } else if (gasMsg === "取消成功") {
+          iconBox.innerText = "🧹"; titleEl.innerText = "取消成功！"; titleEl.style.color = "var(--text-dark)";
+          contentEl.innerText = date + ' ' + name;
+        } else {
+          iconBox.innerText = "⚠️"; titleEl.innerText = "提醒"; titleEl.style.color = "#E67E22";
+          contentEl.innerText = gasMsg;
+        }
+        document.getElementById('resultModal').style.display = 'block';
+      } catch (err) { alert("連線異常，頁面將重新載入"); location.reload(); }
+    }
+
+    async function showUsers(id, name) {
+      const list = document.getElementById('modal-text');
+      document.getElementById('userModal').style.display = 'block';
+      list.innerHTML = `<div style="text-align:center; padding:20px;"><div class="btn-spinner" style="border-top-color:var(--primary); margin:0 auto;"></div></div>`;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getUsers&courseId=${id}`);
+        const users = await res.json();
+        list.innerHTML = (users && users.length > 0) ? users.map((u, i) => `${i + 1}. ${u}`).join('<br>') : "目前尚無人預約";
+      } catch (err) { list.innerHTML = "❌ 查詢失敗"; }
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function changeTab(el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      render(el.getAttribute('data-cat'));
+    }
+  </script>
 </body>
 </html>
