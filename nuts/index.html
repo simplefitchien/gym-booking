@@ -6,12 +6,11 @@
     <title>極簡運動 - 堅果訂購系統</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        /* --- 莫蘭迪藍配色定義 --- */
         :root { 
             --primary-color: #6D8299; --gradient-start: #92A9BD; --gradient-end: #54637A;
             --bg-color: #F4F7F9; --text-primary: #3D454D; --text-secondary: #7D8B99; --border-color: #E1E8ED;
         }
-        body { font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--text-primary); }
+        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--text-primary); }
         .container { background: white; width: 100%; max-width: 450px; border-radius: 24px; box-shadow: 0 15px 35px rgba(109, 130, 153, 0.12); overflow: hidden; position: relative; }
         .header-box { background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); padding: 40px 20px; text-align: center; color: white; }
         .header-box h2 { margin: 0; font-size: 1.6rem; letter-spacing: 3px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -21,9 +20,6 @@
         input[type="text"] { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 1rem; background: #F8FAFB; margin-bottom: 24px; color: var(--text-primary); transition: 0.3s; }
         input[type="text"]:focus { outline: none; border-color: var(--primary-color); background: #fff; }
         .item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--border-color); }
-        .item-info { flex: 1; }
-        .item-name { font-weight: 500; font-size: 1.1rem; }
-        .item-price { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
         .qty-control { display: flex; align-items: center; gap: 15px; }
         .qty-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-color); background: #fff; font-size: 1.2rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .qty-btn:active { background: var(--bg-color); transform: translateY(1px); }
@@ -73,23 +69,22 @@
 
         async function init() {
             try {
-                // 初始化 LIFF
                 await liff.init({ liffId: LIFF_ID });
                 
-                // 向 GAS 請求目前的品項 (doGet)
+                // 取得產品清單
                 const response = await fetch(GAS_URL);
                 products = await response.json();
                 
                 const listEl = document.getElementById('productList');
-                listEl.innerHTML = ''; // 清除讀取中字樣
+                listEl.innerHTML = '';
                 
                 products.forEach(p => {
                     cart[p.name] = 0;
                     listEl.innerHTML += `
                         <div class="item">
-                            <div class="item-info">
-                                <div class="item-name">${p.name}</div>
-                                <div class="item-price">$${p.price}</div>
+                            <div>
+                                <div style="font-weight:500; font-size:1.1rem;">${p.name}</div>
+                                <div style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">$${p.price}</div>
                             </div>
                             <div class="qty-control">
                                 <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
@@ -125,7 +120,7 @@
             const btn = document.getElementById('btnSubmit');
             btn.disabled = true; btn.innerText = '傳送中...';
 
-            // 整理要傳送給 GAS 的品項物件 { "品名": 數量 }
+            // 整理品項資料：{ "品名": 數量 }
             let itemsPayload = {};
             products.forEach(p => {
                 if (cart[p.name] > 0) itemsPayload[p.name] = cart[p.name];
@@ -134,7 +129,7 @@
             try {
                 const userId = liff.getContext() ? liff.getContext().userId : "web_user";
                 
-                // 1. 傳送到 Google 試算表 (doPost)
+                // 傳送到 GAS
                 await fetch(GAS_URL, {
                     method: 'POST',
                     body: JSON.stringify({ 
@@ -145,7 +140,7 @@
                     })
                 });
 
-                // 2. 如果在 LINE 內，發送數位收據訊息
+                // 發送 LINE 收據訊息
                 if (liff.isInClient()) {
                     let orderDetail = products
                         .filter(p => cart[p.name] > 0)
