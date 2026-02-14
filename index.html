@@ -5,106 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>極簡運動 - 課程預約系統</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<style>
-:root { 
-  --primary: #8CB369;      /* 嫩草綠：用於立即預約按鈕，很有活力 */
-  --secondary: #D9E5D6;    /* 鼠尾草綠：標頭背景，清爽不刺眼 */
-  --text-dark: #354F52;     /* 森林深綠：用於文字，比黑色高級且清晰度高 */
-  --bg: #F8FAF8;           /* 近乎白的綠底：提升整體亮度 */
-  --tag-bg: #84A59D;       /* 灰綠色：用於標籤或次要資訊 */
-}
-    body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+  <style>
+    :root { 
+      --primary: #8CB369;      /* 嫩草綠 (主動功能) */
+      --secondary: #E3EAE2;    /* 淺色綠標頭 */
+      --text-main: #344E41;    /* 森林深灰綠 (取代奇怪的咖啡色) */
+      --text-light: #84A59D;   /* 次要資訊色 */
+      --bg: #F8FAF8;           
+      --card-bg: #FFFFFF;
+      --cancel-color: #A5A5A5; /* 取消/關閉的輔助色 */
+    }
+    body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text-main); }
     
-    /* --- Header 調整：高度再壓縮，下排改為直角 --- */
+    /* --- Header：極致精簡、下排直角 --- */
     .header { 
       background: var(--secondary); 
-      margin: 15px 15px 0 15px; /* 下方邊距設為0，準備銜接 */
-      padding: 22px 20px;       /* 高度再次減少 1/4 */
+      margin: 15px 15px 0 15px; 
+      padding: 18px 20px;       /* 再次壓縮高度 */
       text-align: center;         
-      border-radius: 30px 30px 0 0; /* 下排取消圓角 */
-      box-shadow: 0 4px 12px rgba(93, 64, 55, 0.08); 
-      border-bottom: 2px solid rgba(93, 64, 55, 0.05);
+      border-radius: 25px 25px 0 0; 
+      border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .header-title-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 5px;
+      gap: 10px;
+      margin-bottom: 4px;
     }
-    .header-icon { font-size: 28px; }
+    .header-icon { font-size: 24px; }
     .header-title { 
-      font-size: 24px; 
+      font-size: 22px; 
       font-weight: 800; 
-      letter-spacing: 2px; 
+      letter-spacing: 1.5px; 
       margin: 0; 
-      color: var(--text-dark); 
+      color: var(--text-main); 
     }
     .user-welcome { 
       font-size: 13px; 
-      color: rgba(93, 64, 55, 0.7); 
-      margin-top: 5px; 
+      color: var(--text-light); 
+      margin-top: 3px; 
       font-weight: 500;
     }
 
-    /* 選單樣式：與 Header 銜接 */
+    /* 選單樣式：銜接 Header */
     .nav-tabs { 
       display: flex; 
-      margin: 0 15px 20px 15px; 
+      margin: 0 15px 15px 15px; 
       background: #FFF; 
-      border-radius: 0 0 25px 25px; /* 上方直角，下方大圓角 */
-      padding: 8px; 
-      box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+      border-radius: 0 0 20px 20px; 
+      padding: 6px; 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.02);
     }
     .tab { 
-      flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 15px; 
-      font-weight: 700; font-size: 15px; color: #A89386; cursor: pointer; transition: 0.3s;
+      flex: 1; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 12px; 
+      font-weight: 700; font-size: 14px; color: var(--text-light); cursor: pointer; transition: 0.3s;
     }
     .tab.active { 
-      background: var(--text-dark); /* 點選改為深色系，更有質感 */
+      background: var(--text-main); 
       color: white; 
     }
 
-    /* 課程卡片樣式 */
+    /* 課程卡片 */
     #course-list { padding: 0 20px 80px 20px; }
     .card { 
-      background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; 
-      box-shadow: 0 8px 15px rgba(93, 64, 55, 0.03); border: 1px solid #EFE9E2;
+      background: var(--card-bg); border-radius: 20px; padding: 18px; margin-bottom: 12px; 
+      box-shadow: 0 4px 12px rgba(52, 78, 65, 0.04); border: 1px solid #E9EFE9;
     }
-    .course-date { font-size: 0.9em; color: var(--tag-bg); font-weight: 800; margin-bottom: 5px; }
-    .course-title { font-size: 1.3em; font-weight: 900; color: var(--text-dark); margin: 5px 0; }
+    .course-date { font-size: 0.85em; color: var(--text-light); font-weight: 800; margin-bottom: 4px; }
+    .course-title { font-size: 1.25em; font-weight: 900; color: var(--text-main); margin: 3px 0; }
     .teacher-tag { 
-      font-size: 0.9em; background: #FDFBF9; color: var(--text-dark); padding: 4px 12px; border: 1px solid #E7D7C1; border-radius: 8px; font-weight: 700;
+      font-size: 0.85em; background: #F4F7F4; color: var(--text-main); padding: 4px 10px; border: 1px solid #D9E5D6; border-radius: 8px; font-weight: 700;
     }
-    .course-detail { font-size: 0.9em; color: #8D7A71; margin-top: 8px; font-weight: 500; }
-    .card-footer { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #F8F5F2; }
-    .capacity-link { color: #A89386; text-decoration: underline; cursor: pointer; font-weight: 700; font-size: 0.9em; }
+    .course-detail { font-size: 0.85em; color: var(--text-light); margin-top: 6px; }
+    .card-footer { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #F0F4F0; }
+    .capacity-link { color: var(--text-light); text-decoration: underline; cursor: pointer; font-size: 0.85em; }
 
-    /* 按鈕樣式 */
+    /* --- 按鈕樣式優化 --- */
     .btn-book { 
-      width: 100px; height: 38px; border-radius: 12px; border: none; font-weight: 800; font-size: 0.9em; 
+      width: 90px; height: 36px; border-radius: 18px; border: none; font-weight: 800; font-size: 0.85em; 
       cursor: pointer; transition: 0.2s;
     }
-    .btn-active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 179, 71, 0.3); }
-    .btn-delete { background: var(--text-dark); color: white; }
-    .btn-full { background: #D2CDC9; color: white; cursor: not-allowed; }
+    .btn-active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(140, 179, 105, 0.25); }
     
-    /* 彈窗等其餘樣式省略，維持原功能... */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(93, 64, 55, 0.3); backdrop-filter: blur(4px); }
-    .modal-content { background: #fff; margin: 30% auto; padding: 30px; border-radius: 25px; width: 80%; max-width: 320px; text-align: center; border: 2px solid var(--secondary); }
-    .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+    /* 取消預約：改為幽靈按鈕風格，減少壓迫感 */
+    .btn-delete { 
+      background: transparent; 
+      color: var(--cancel-color); 
+      border: 1px solid #DDD; 
+      width: 90px;
+    }
+    .btn-full { background: #E0E0E0; color: white; cursor: not-allowed; }
+
+    /* --- 彈窗優化：輕量化設計 --- */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(52, 78, 65, 0.2); backdrop-filter: blur(4px); }
+    .modal-content { background: #fff; margin: 35% auto; padding: 25px; border-radius: 25px; width: 75%; max-width: 300px; text-align: center; }
+    .modal-list { text-align: left; margin: 15px 0; max-height: 180px; overflow-y: auto; line-height: 2.2; border-top: 1px solid #F0F4F0; padding-top: 12px; font-size: 14px; color: var(--text-main); }
+    
+    /* 彈窗按鈕：不再滿版，更圓潤 */
+    .btn-modal-cancel { 
+      width: 50%;               /* 縮減寬度 */
+      padding: 10px; 
+      border-radius: 20px; 
+      border: 1px solid #EEE; 
+      background: #F9F9F9; 
+      color: var(--cancel-color); 
+      cursor: pointer; 
+      font-weight: bold;
+      margin: 10px auto 0;
+      display: block;
+    }
+    .btn-modal-confirm { flex: 1; padding: 10px; border-radius: 15px; border: none; background: var(--primary); color: #fff; font-weight: bold; }
+    
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   </style>
 </head>
 <body>
 
   <div class="header">
     <div class="header-title-container">
+      <span class="header-icon">🌿</span>
+      <h1 class="header-title">極簡運動</h1>
       <span class="header-icon">🧘</span>
-      <h1 class="header-title">探索運動</h1>
-      <span class="header-icon">🏋️</span>
     </div>
-    <div id="status" class="user-welcome">正在取得資料...</div>
+    <div id="status" class="user-welcome">載入中...</div>
   </div>
   
   <div class="nav-tabs">
@@ -113,13 +138,11 @@
   </div>
 
   <div id="course-list">
-    <div style="text-align:center; padding:100px; color:#BDC3C7;"><div class="btn-spinner" style="border-top-color:var(--primary); margin:0 auto 10px;"></div>同步中...</div>
-  </div>
+    </div>
 
-  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:900;">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" style="width:100%; border-radius:18px;" onclick="closeModal('userModal')">關閉</button></div></div>
-  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:#BDC3C7; font-weight:700;">CONFIRM</h3><p id="confirm-msg" style="font-size: 1.3em; font-weight: 900; color: var(--text-dark);"></p><div style="display:flex; gap:12px; margin-top:25px;"><button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
-  <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" class="result-icon"></span><h3 id="result-title" style="margin:0; font-weight:900;"></h3><div id="result-content" style="font-size: 1.2em; font-weight: 900; margin: 15px 0; color: var(--text-dark);"></div><button class="btn-modal-confirm" style="width:100%;" onclick="location.reload()">確定</button></div></div>
-
+  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:900; color:var(--text-main);">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" onclick="closeModal('userModal')">關閉</button></div></div>
+  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:var(--text-light); font-weight:700; font-size:14px;">確認操作</h3><p id="confirm-msg" style="font-size: 1.1em; font-weight: 800; color: var(--text-main); margin: 10px 0;"></p><div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-modal-cancel" style="margin:0; width:100%;" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
+  <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" style="font-size:50px; display:block; margin-bottom:10px;"></span><h3 id="result-title" style="margin:0; font-weight:900;"></h3><div id="result-content" style="font-size: 1em; margin: 10px 0; color: var(--text-main);"></div><button class="btn-modal-confirm" style="width:100%; border-radius:15px;" onclick="location.reload()">確定</button></div></div>
   <script>
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
@@ -256,6 +279,7 @@
   </script>
 </body>
 </html>
+
 
 
 
