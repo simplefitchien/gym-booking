@@ -99,19 +99,32 @@
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(52, 78, 65, 0.2); backdrop-filter: blur(4px); }
     .modal-content { background: #fff; margin: 35% auto; padding: 25px; border-radius: 25px; width: 75%; max-width: 300px; text-align: center; }
     .modal-list { text-align: left; margin: 15px 0; max-height: 180px; overflow-y: auto; line-height: 2.2; border-top: 1px solid #F0F4F0; padding-top: 12px; font-size: 14px; color: var(--text-main); }
+    
+    /* 修正確認視窗按鈕：等寬對稱設計 */
+    .modal-btn-container {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .btn-modal-cancel, .btn-modal-confirm { 
+      flex: 1;              /* 讓兩個按鈕平分空間 */
+      padding: 12px; 
+      border-radius: 15px; 
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0;            /* 移除原有的 margin-auto */
+    }
     .btn-modal-cancel { 
-      width: 50%; 
-      padding: 10px; 
-      border-radius: 20px; 
       border: 1px solid #EEE; 
       background: #F9F9F9; 
       color: var(--cancel-color); 
-      cursor: pointer; 
-      font-weight: bold;
-      margin: 10px auto 0;
-      display: block;
     }
-    .btn-modal-confirm { flex: 1; padding: 10px; border-radius: 15px; border: none; background: var(--primary); color: #fff; font-weight: bold; }
+    .btn-modal-confirm { 
+      border: none; 
+      background: var(--primary); 
+      color: #fff; 
+    }
     
     /* 旋轉動畫 */
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -141,11 +154,36 @@
     </div>
   </div>
 
-  <div id="userModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; font-weight:900; color:var(--text-main);">預約名單</h3><div id="modal-text" class="modal-list"></div><button class="btn-modal-cancel" onclick="closeModal('userModal')">關閉</button></div></div>
-  <div id="confirmModal" class="modal"><div class="modal-content"><h3 style="margin-top:0; color:var(--text-light); font-weight:700; font-size:14px;">確認操作</h3><p id="confirm-msg" style="font-size: 1.1em; font-weight: 800; color: var(--text-main); margin: 10px 0;"></p><div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-modal-cancel" style="margin:0; width:100%;" onclick="closeModal('confirmModal')">取消</button><button id="btn-do-action" class="btn-modal-confirm">確定</button></div></div></div>
-  <div id="resultModal" class="modal"><div class="modal-content"><span id="result-icon-box" style="font-size:50px; display:block; margin-bottom:10px;"></span><h3 id="result-title" style="margin:0; font-weight:900;"></h3><div id="result-content" style="font-size: 1em; margin: 10px 0; color: var(--text-main);"></div><button class="btn-modal-confirm" style="width:100%; border-radius:15px;" onclick="location.reload()">確定</button></div></div>
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin-top:0; font-weight:900; color:var(--text-main);">預約名單</h3>
+      <div id="modal-text" class="modal-list"></div>
+      <button class="btn-modal-cancel" style="width:100%;" onclick="closeModal('userModal')">關閉</button>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:var(--text-light); font-weight:700; font-size:14px;">確認操作</h3>
+      <p id="confirm-msg" style="font-size: 1.1em; font-weight: 800; color: var(--text-main); margin: 10px 0;"></p>
+      <div class="modal-btn-container">
+        <button class="btn-modal-cancel" onclick="closeModal('confirmModal')">取消</button>
+        <button id="btn-do-action" class="btn-modal-confirm">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <span id="result-icon-box" style="font-size:50px; display:block; margin-bottom:10px;"></span>
+      <h3 id="result-title" style="margin:0; font-weight:900;"></h3>
+      <div id="result-content" style="font-size: 1em; margin: 15px 0; color: var(--text-main);"></div>
+      <button class="btn-modal-confirm" style="width:100%; border-radius:15px;" onclick="location.reload()">確定</button>
+    </div>
+  </div>
 
   <script>
+    // --- JavaScript 邏輯部分保持不變 ---
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
     let allCourses = [];
@@ -186,7 +224,6 @@
         const btnId = `btn-${c["課程ID"]}`;
         let btnHtml = "";
 
-        // 時間鎖定邏輯
         let isTimeLocked = false;
         if (c["日期"] && c["時段"]) {
           const startTimeStr = String(c["時段"]).split(/[-~]/)[0].trim();
