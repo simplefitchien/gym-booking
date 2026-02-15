@@ -133,7 +133,7 @@
                 // --- 自動判斷結單邏輯 ---
                 const now = new Date();
                 const day = now.getDate(); 
-                const isClosed = (day > 5); // 5 號後結單
+                const isClosed = (day < 5); // 5 號後結單day > 5
 
                 if (isClosed) {
                     // 1. 更新標題下方的狀態標籤
