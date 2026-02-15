@@ -88,6 +88,8 @@
                 <span class="header-icon squirrel-anim">🐿️</span>
             </div>
             <div class="sub-header-info">每月一號登記、五號結單</div>
+            <div id="orderStatus" style="margin-top:8px; display:inline-block; padding:3px 12px; background:rgba(255,255,255,0.2); border-radius:20px; font-size:0.75rem;">
+        開放訂購中</div>
         </div>
         <div class="content">
             <input type="text" id="studentName" placeholder="請輸入您的姓名">
@@ -121,32 +123,59 @@
         const LIFF_ID = '2009018322-wSwBR4OO';
 
         async function init() {
-            try {
-                await liff.init({ liffId: LIFF_ID });
-                const response = await fetch(GAS_URL);
-                products = await response.json();
-                const listEl = document.getElementById('productList');
-                listEl.innerHTML = '';
-                products.forEach(p => {
-                    cart[p.name] = 0;
-                    listEl.innerHTML += `
-                        <div class="item">
-                            <div class="item-info">
-                                <div style="font-weight:500; font-size:1.1rem;">${p.name}</div>
-                                <div style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">$${p.price}</div>
-                            </div>
-                            <div class="qty-control">
-                                <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
-                                <span class="qty-num" id="qty-${p.name}">0</span>
-                                <button class="qty-btn" onclick="updateQty('${p.name}', 1)">+</button>
-                            </div>
-                        </div>`;
-                });
-            } catch (err) {
-                document.getElementById('productList').innerText = '載入失敗。';
-            }
+        try {
+        await liff.init({ liffId: LIFF_ID });
+        const response = await fetch(GAS_URL);
+        products = await response.json();
+        const listEl = document.getElementById('productList');
+        listEl.innerHTML = '';
+
+        // --- 自動判斷結單邏輯 ---
+        const now = new Date();
+        const day = now.getDate(); // 取得今日日期
+        const isClosed = (day > 5); // 如果大於 5 號就結單
+
+        if (isClosed) {
+            // 1. 更新標題下方的狀態標籤
+            document.getElementById('orderStatus').innerText = '本月訂購已結單';
+            document.getElementById('orderStatus').style.background = '#E74C3C'; // 變成紅色
+
+            // 2. 顯示結單訊息並鎖定清單
+            listEl.innerHTML = `
+                <div style="text-align:center; padding:40px 20px; color:var(--text-secondary);">
+                    <div style="font-size:3rem; margin-bottom:10px;">📅</div>
+                    <b>本月預訂已滿載！</b><br>
+                    感謝支持，下個月1號準時再見。
+                </div>`;
+            
+            // 3. 禁用送出按鈕
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.style.background = "#BDC3C7";
+            btn.innerText = '已結單';
+            return; // 結單後就不跑後續產品渲染
         }
 
+        // --- 正常開放訂購時的渲染 ---
+        products.forEach(p => {
+            cart[p.name] = 0;
+            listEl.innerHTML += `
+                <div class="item">
+                    <div class="item-info">
+                        <div style="font-weight:500; font-size:1.1rem;">${p.name}</div>
+                        <div style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">$${p.price}</div>
+                    </div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty('${p.name}', -1)">−</button>
+                        <span class="qty-num" id="qty-${p.name}">0</span>
+                        <button class="qty-btn" onclick="updateQty('${p.name}', 1)">+</button>
+                    </div>
+                </div>`;
+        });
+    } catch (err) {
+        document.getElementById('productList').innerText = '載入失敗。';
+    }
+}
         function updateQty(name, delta) {
             cart[name] = Math.max(0, cart[name] + delta);
             document.getElementById(`qty-${name}`).innerText = cart[name];
