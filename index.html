@@ -183,7 +183,6 @@
   </div>
 
   <script>
-    // --- JavaScript 邏輯部分保持不變 ---
     const LIFF_ID = "2009018322-JGFORbhc"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyqqHMc1rSs9Ug1RS2WjS-HR3cXoePF6P8-iCvSzQa1ZPpDmQw2ogSA0ywLq84CVdxB/exec"; 
     let allCourses = [];
@@ -233,14 +232,15 @@
           if (classStart.getTime() - now.getTime() < 3 * 60 * 60 * 1000) { isTimeLocked = true; }
         }
 
+        // --- 修正處：按鈕綁定完整的五項比對資訊 ---
         if (isTimeLocked) {
           btnHtml = `<button class="btn-book btn-full" style="font-size:0.85em;">已截止</button>`;
         } else if (c["isBooked"]) {
-          btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}')">取消預約</button>`;
+          btnHtml = `<button id="${btnId}" class="btn-book btn-delete" onclick="askAction('${c["課程ID"]}', 'delete', '${c["名稱"]}', '${dateStr}', '${c["時段"]}', '${c["星期"]}')">取消預約</button>`;
         } else {
           btnHtml = (current >= max) 
             ? `<button class="btn-book btn-full">滿額</button>` 
-            : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}')">立即預約</button>`;
+            : `<button id="${btnId}" class="btn-book btn-active" onclick="askAction('${c["課程ID"]}', 'book', '${c["名稱"]}', '${dateStr}', '${c["時段"]}', '${c["星期"]}')">立即預約</button>`;
         }
 
         container.innerHTML += `<div class="card">
@@ -258,21 +258,35 @@
       });
     }
 
-    function askAction(id, action, name, date) {
+    // --- 修正處：接收與傳遞完整的比對資訊 ---
+    function askAction(id, action, name, date, time, day) {
       const modal = document.getElementById('confirmModal');
       document.getElementById('confirm-msg').innerText = (action === 'delete' ? '取消 ' : '預約 ') + date + ' ' + name;
-      document.getElementById('btn-do-action').onclick = function() { closeModal('confirmModal'); executeAction(id, action, name, date); };
+      document.getElementById('btn-do-action').onclick = function() { 
+        closeModal('confirmModal'); 
+        executeAction(id, action, name, date, time, day); 
+      };
       modal.style.display = 'block';
     }
 
-    async function executeAction(id, action, name, date) {
+    async function executeAction(id, action, name, date, time, day) {
       const btn = document.getElementById(`btn-${id}`);
       if (btn) { btn.disabled = true; btn.innerHTML = `<div class="btn-spinner"></div>`; }
       try {
         const profile = await liff.getProfile();
+        // --- 修正處：將五項 Key 值封裝進 POST 請求 ---
         const response = await fetch(GAS_URL, { 
           method: "POST", 
-          body: JSON.stringify({ action, courseId: id, userId: profile.userId, userName: profile.displayName }) 
+          body: JSON.stringify({ 
+            action, 
+            courseId: id, 
+            courseName: name, 
+            courseDate: date, 
+            courseTime: time, 
+            courseDay: day, 
+            userId: profile.userId, 
+            userName: profile.displayName 
+          }) 
         });
         const result = await response.json();
         const gasMsg = result.result;
