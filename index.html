@@ -129,6 +129,17 @@
     /* 旋轉動畫 */
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
    .btn-spinner { width: 18px; height: 18px; border: 2.5px solid rgba(0,0,0,0.05); border-top: 2.5px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+    
+    /* --- 針對「綠色按鈕內」的轉圈進行配色優化 --- */
+    /* 當 .btn-spinner 位在 .btn-active (綠底按鈕) 內部時才變白 */
+    .btn-active .btn-spinner {
+    /* 底圈：設為極淺的白色 */
+    border: 2.5px solid rgba(255, 255, 255, 0.2) !important;
+    /* 動態部分：強制設為純白色 */
+    border-top: 2.5px solid #FFFFFF !important;
+}
+
+/* 其餘地方（如 .btn-delete 白底按鈕、白底彈窗、初始載入）會自動維持原本的綠色轉圈 */
   </style>
 </head>
 <body>
