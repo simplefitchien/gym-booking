@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極簡運動 - 場館導覽</title>
+    <style>
+        :root {
+            --primary: #D4A373;
+            --secondary: #FAEDCD;
+            --text-main: #4A4238;
+            --text-light: #B99768;
+            --bg: #FEFAE0;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: -apple-system, "Noto Sans TC", sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .header {
+            background: var(--secondary);
+            margin: 15px 15px 0 15px;
+            padding: 22px;
+            text-align: center;
+            border-radius: 25px 25px 0 0;
+            border-bottom: 2px solid rgba(212, 163, 115, 0.1);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin: 0 15px 15px 15px;
+            background: #FFF;
+            border-radius: 0 0 20px 20px;
+            padding: 6px;
+            box-shadow: 0 8px 15px rgba(74, 66, 56, 0.05);
+        }
+
+        .tab {
+            flex: 1;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .tab.active {
+                background: var(--primary);
+                color: #FFFFFF;
+            }
+
+        #info-content {
+            padding: 0 20px 80px 20px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 15px;
+            border: 1px solid #F5EBD0;
+            box-shadow: 0 6px 15px rgba(212, 163, 115, 0.05);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-logo-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.1);
+        }
+
+        .unified-info {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 15px;
+        }
+
+        .info-detail {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        .phone-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* 地址與小導航按鈕 */
+        .address-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .mini-map-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Slogan 區塊 */
+        .slogan-box {
+            margin-top: 25px;
+            text-align: center;
+            border-top: 1px solid rgba(212, 163, 115, 0.15);
+            padding-top: 20px;
+        }
+
+        .slogan-en {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .slogan-cn {
+            font-size: 16px;
+            line-height: 2.2;
+            color: var(--text-main);
+            margin: 0;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .venue-img {
+            width: 100%;
+            border-radius: 18px;
+            margin-top: 18px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+            font-size: 15px;
+        }
+
+        .rule-num {
+            background: var(--secondary);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px dashed var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 class="header-title">☀️ 場館導覽</h1>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab(this, 'intro')">探索空間</div>
+        <div class="tab" onclick="switchTab(this, 'rules')">場館須知</div>
+        <div class="tab" onclick="switchTab(this, 'price')">收費方案</div>
+    </div>
+
+    <div id="info-content">
+        <div id="intro" class="tab-pane">
+            <div class="info-card">
+                <div class="section-logo-box">
+                    <div class="logo-circle">👑</div>
+                </div>
+
+                <div class="unified-info">
+                    <div class="info-detail">
+                        <strong>負責人：</strong>簡老師<br>
+                        <strong>聯繫電話：</strong><a href="tel:0921824805" class="phone-link">0921-824-805</a><br>
+                        <div class="address-row">
+                            <span><strong>場館地址：</strong>高雄市左營區介壽路205號1樓</span>
+                            <a href="https://maps.google.com/?q=高雄市左營區介壽路205號1樓" target="_blank" class="mini-map-btn">📍</a>
+                        </div>
+                    </div>
+
+                    <div class="slogan-box">
+                        <span class="slogan-en">SIMPLE FITNESS</span>
+                        <p class="slogan-cn">
+                            <span style="color: var(--primary); font-weight: 800;">極簡運動</span> 捨棄繁瑣<br>
+                            只為給您最溫暖的訓練空間
+                        </p>
+                    </div>
+                </div>
+                <img src="您的照片網址" class="venue-img" alt="場館照片">
+            </div>
+        </div>
+
+        <div id="rules" class="tab-pane" style="display:none;">
+            <div class="info-card">
+                <div class="section-logo-box">
+                    <div class="logo-circle">📜</div>
+                </div>
+                <div class="rule-item"><div class="rule-num">1</div><span>自由座課程，請自由入場。</span></div>
+                <div class="rule-item"><div class="rule-num">2</div><span>預約制課程，上課前三小時完成預約/取消。</span></div>
+                <div class="rule-item"><div class="rule-num">3</div><span>每周日開放下一週課程預約。</span></div>
+                <div class="rule-item"><div class="rule-num">4</div><span>請換穿乾淨室內鞋進場。</span></div>
+                <div class="rule-item"><div class="rule-num">5</div><span>教室內禁止飲食，保持整潔。</span></div>
+                <div class="rule-item"><div class="rule-num">6</div><span>器材使用後請協助擦拭與歸位。</span></div>
+            </div>
+        </div>
+
+        <div id="price" class="tab-pane" style="display:none;">
+            <div class="info-card">
+                <div class="section-logo-box">
+                    <div class="logo-circle">💰</div>
+                </div>
+                <div class="price-item"><span>首次體驗</span><span style="font-weight:900;">$299/堂</span></div>
+                <div class="price-item"><span>課堂卡</span><span style="font-weight:900;">$50/點</span></div>
+                <div class="price-item"><span>自由座課程</span><span style="font-weight:900;">五點</span></div>
+                <div class="price-item"><span>預約制課程</span><span style="font-weight:900;">六點</span></div>
+                <div class="price-item" style="border-bottom: none;"><span>私人指導課程</span><span style="font-weight:900;">請洽簡老師</span></div>
+                <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; font-size: 13px; font-weight: 700;">
+                    課卡無效期，自在運動無壓力
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(el, paneId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+            document.getElementById(paneId).style.display = 'block';
+        }
+    </script>
+</body>
+</html>
