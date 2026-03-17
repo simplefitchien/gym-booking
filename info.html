@@ -96,7 +96,61 @@
             margin-top: 5px;
         }
 
-        /* --- 底部品牌圖片樣式 --- */
+        .section-title {
+            text-align: center;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin: 25px 0 15px 0;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .grid-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.1);
+        }
+
+        .map-container {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.1);
+            border: 1px solid var(--secondary);
+        }
+
+        .map-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(212, 163, 115, 0.3);
+            transition: all 0.2s;
+        }
+
+            .map-btn:active {
+                transform: scale(0.96);
+                background: #B99768;
+            }
+
         .brand-footer {
             margin-top: 30px;
             padding-top: 25px;
@@ -112,7 +166,6 @@
                 display: block;
             }
 
-        /* 內容列表樣式 */
         .rule-item {
             display: flex;
             gap: 12px;
@@ -158,7 +211,28 @@
         <div id="intro" class="tab-pane">
             <div class="info-card">
                 <div class="logo-circle">👑</div>
-                <img src="https://via.placeholder.com/600x400" class="venue-img" alt="場館照片">
+                <div class="section-title">場館環境</div>
+                <div class="photo-grid">
+                    <img src="pic/room1.jpg" class="grid-img" onerror="this.src='https://via.placeholder.com/300x300/FAEDCD/A1887F?text=照片1'">
+                    <img src="pic/room2.jpg" class="grid-img" onerror="this.src='https://via.placeholder.com/300x300/FAEDCD/A1887F?text=照片2'">
+                    <img src="pic/room3.jpg" class="grid-img" onerror="this.src='https://via.placeholder.com/300x300/FAEDCD/A1887F?text=照片3'">
+                    <img src="pic/room4.jpg" class="grid-img" onerror="this.src='https://via.placeholder.com/300x300/FAEDCD/A1887F?text=照片4'">
+                </div>
+
+                <div class="section-title">交通位置</div>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3681.332062562136!2d120.27959987603612!3d22.681096179415477!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346e05ca29a570ef%3A0x59db93f77b51ebee!2z5qW157Ch6YGL6YuV!5e0!3m2!1szh-TW!2stw!4v1711234567890!5m2!1szh-TW!2stw"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+
+                <a href="https://www.google.com/maps/search/?api=1&query=%E6%A5%B5%E7%B0%A1%E9%81%8B%E5%8B%95&query_place_id=ChIJ73Cl2coFbjQR7utRe_eT21k" target="_blank" class="map-btn">
+                    📍 開啟 Google 地圖導航
+                </a>
 
                 <div class="brand-footer">
                     <img src="pic/slogan.png" alt="極簡運動 - 品牌資訊">
@@ -175,7 +249,6 @@
                 <div class="rule-item"><div class="rule-num">4</div><span>請換穿乾淨室內鞋進場 (瑜珈課程除外)。</span></div>
                 <div class="rule-item"><div class="rule-num">5</div><span>教室內禁止飲食，保持整潔環境。</span></div>
                 <div class="rule-item"><div class="rule-num">6</div><span>器材使用後請協助擦拭並歸位。</span></div>
-
                 <div class="brand-footer">
                     <img src="pic/slogan.png" alt="極簡運動 - 品牌資訊">
                 </div>
@@ -190,7 +263,6 @@
                 <div class="price-item"><span>自由座課程</span><strong>五點</strong></div>
                 <div class="price-item"><span>預約制課程</span><strong>六點</strong></div>
                 <div class="price-item" style="border-bottom: none;"><span>私人指導課程</span><strong>請洽簡老師</strong></div>
-
                 <div class="brand-footer">
                     <img src="pic/slogan.png" alt="極簡運動 - 品牌資訊">
                 </div>
